@@ -1,0 +1,19 @@
+{
+  "name": "ember-help-wanted-webhook",
+  "version": "0.0.0",
+  "description": "Used to handle webhook notifications for Github issues",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ember-learn/ember-help-wanted-webhook.git"
+  },
+  "author": "David Baker",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ember-learn/ember-help-wanted-webhook/issues"
+  },
+  "homepage": "https://github.com/ember-learn/ember-help-wanted-webhook"
+}
