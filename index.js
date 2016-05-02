@@ -13,12 +13,6 @@ var config = {
   secret: process.env.WEBHOOK_SECRET || 'oursecrethere'
 };
 
-//if (process.env.WEBHOOK_SECRET === undefined) {
-//  console.error('No webhook secret defined, stopping now');
-//  return;
-//}
-
-
 var handler = createHandler({ path: config.path, secret: config.secret });
 
 http.createServer(function (req, res) {
