@@ -4,31 +4,29 @@ var util = require('util');
 
 var http = require('http');
 var createHandler = require('github-webhook-handler');
-var issueHandler = require('./issue-handler');
+var issueHandler = require('./lib/issue-handler');
 
 var config = {
+  ip: process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
   path: '/issue-handler',
-  port: 4567,
-  secret: 'oursecrethere'
+  port: process.env.OPENSHIFT_NODEJS_PORT || 8080,
+  secret: process.env.WEBHOOK_SECRET || 'oursecrethere'
 };
 
-if (process.env.PORT !== undefined) {
-  config.port = process.env.PORT;
-}
-if (process.env.WEBHOOK_SECRET === undefined) {
-  console.error('No webhook secret defined, stopping now');
-  return;
-}
+//if (process.env.WEBHOOK_SECRET === undefined) {
+//  console.error('No webhook secret defined, stopping now');
+//  return;
+//}
 
 
-var handler = createHandler({ path: config.path, secret: process.env.WEBHOOK_SECRET });
+var handler = createHandler({ path: config.path, secret: config.secret });
 
 http.createServer(function (req, res) {
   handler(req, res, function (err) {
     res.statusCode = 404;
     res.end('no such location');
   });
-}).listen(config.port);
+}).listen(config.port, config.ip);
 
 handler.on('error', function (err) {
   console.error('Error:', err.message);

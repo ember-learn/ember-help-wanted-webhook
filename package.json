@@ -4,6 +4,7 @@
   "description": "Used to handle webhook notifications for Github issues",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "node tests/nodetest-runner.js"
   },
   "repository": {
