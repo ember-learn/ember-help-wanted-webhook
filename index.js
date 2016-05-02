@@ -27,7 +27,7 @@ handler.on('error', function (err) {
 });
 
 handler.on('ping', function (event) {
-  console.log('Received a ping event for %s to %s',
+  console.log('Received ping event for %s to %s',
     event.payload.repository.name,
     util.inspect(event.payload.hook, false, null)
   );
