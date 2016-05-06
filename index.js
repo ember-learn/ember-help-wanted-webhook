@@ -13,12 +13,6 @@ var config = {
   secret: process.env.WEBHOOK_SECRET || 'oursecrethere'
 };
 
-//if (process.env.WEBHOOK_SECRET === undefined) {
-//  console.error('No webhook secret defined, stopping now');
-//  return;
-//}
-
-
 var handler = createHandler({ path: config.path, secret: config.secret });
 
 http.createServer(function (req, res) {
@@ -33,7 +27,7 @@ handler.on('error', function (err) {
 });
 
 handler.on('ping', function (event) {
-  console.log('Received a ping event for %s to %s',
+  console.log('Received ping event for %s to %s',
     event.payload.repository.name,
     util.inspect(event.payload.hook, false, null)
   );
