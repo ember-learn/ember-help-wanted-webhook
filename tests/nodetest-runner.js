@@ -4,7 +4,7 @@
 
 var glob = require('glob');
 var Mocha = require('mocha');
-var Promise = require('../lib/ember-cli-promise');
+var Promise = require('../src/lib/ember-cli-promise');
 var mochaOnlyDetector = require('mocha-only-detector');
 
 if (process.env.EOLNEWLINE) {

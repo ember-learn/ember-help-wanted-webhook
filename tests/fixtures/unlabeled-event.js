@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   "payload": {
     "action": "unlabeled",
     "issue": {

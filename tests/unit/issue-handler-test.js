@@ -2,15 +2,15 @@
 /* jshint mocha: true */
 'use strict';
 
-var assert = require('assert');
-var path = require('path');
-var sinon = require('sinon');
+import assert from 'assert';
+import path from 'path';
+import sinon from 'sinon';
 
-var IssueHandler = require('../../lib/issue-handler');
-var fakeEvent = require('../fixtures/unlabeled-event');
+import IssueHandler from '../../src/lib/issue-handler';
+import UnlabeledEvent from '../fixtures/unlabeled-event';
+import LabeledEvent from '../fixtures/labeled-event';
 
 describe('adding a label to an issue', function() {
-  var fakeEvent = require('../fixtures/labeled-event');
 
   it('updates Firebase', function() {
 
@@ -28,7 +28,7 @@ describe('adding a label to an issue', function() {
       repoUrl: 'https://github.com/emberjs/ember.js'
     };
 
-    var result = IssueHandler.issueLabeled(fakeEvent);
+    var result = IssueHandler.issueLabeled(LabeledEvent);
 
     addIssue.restore();
     sinon.assert.calledWith(addIssue, expectedIssueHash);
@@ -40,7 +40,7 @@ describe('adding a label to an issue', function() {
 describe('removing a label removes it from our Firebase list', function() {
   it('updates Firebase', function() {
 
-    var result = IssueHandler.issueUnlabeled(fakeEvent);
+    var result = IssueHandler.issueUnlabeled(UnlabeledEvent);
     assert.ok(false, 'Need to confirm that we send the right info to mocked Firebase function');
     assert.ok(result, 'issue not properly removed');
   });
@@ -48,14 +48,15 @@ describe('removing a label removes it from our Firebase list', function() {
 
 describe('closing a label removes it from our Firebase list', function() {
   it('updates Firebase', function () {
-    var result = IssueHandler.issueClosed(fakeEvent);
+    var result = IssueHandler.issueClosed(UnlabeledEvent);
     assert.ok(result, 'issue not properly removed');
     assert.ok(false, 'Need to confirm that we send the right info to mocked Firebase function');
   });
 });
+
 describe('reopening a label adds it to our Firebase list', function() {
   it('updates Firebase', function () {
-    var result = IssueHandler.issueReopened(fakeEvent);
+    var result = IssueHandler.issueReopened(UnlabeledEvent);
     assert.ok(result, 'issue not properly reopened');
     assert.ok(false, 'Need to confirm that we send the right info to mocked Firebase function');
   });

@@ -1,12 +1,10 @@
 /* jshint node: true */
 /* jshint mocha: true */
-'use strict';
+import assert from 'assert';
+import path from 'path';
+import sinon from 'sinon';
 
-var assert = require('assert');
-var path = require('path');
-var sinon = require('sinon');
-
-var DataStore = require('../../lib/datastore-client');
+import DataStore from '../../src/lib/datastore-client';
 
 describe('adding an issue works', function() {
 
