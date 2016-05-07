@@ -8,8 +8,7 @@ export default class IssueHandler {
   }
 
   label(event) {
-    const results = this._hasOneOfDesiredLabels(event.payload);
-    if (!results) {
+    if (!this._hasOneOfDesiredLabels(event.payload)) {
       return false;
     }
 
@@ -24,6 +23,10 @@ export default class IssueHandler {
     } else {
       return this._removeIssueFromDatastore(issue);
     }
+  }
+
+  edit(event) {
+    return this.label(event);
   }
 
   close(event) {
@@ -62,7 +65,6 @@ export default class IssueHandler {
   * @returns {boolean}
   */
   _removeIssueFromDatastore(internalIssueHash) {
-
     // clean things up on Firebase
     return this.dataStoreClient.removeIssue(internalIssueHash);
   }
@@ -74,7 +76,6 @@ export default class IssueHandler {
   * @returns {boolean}
   */
   _hasOneOfDesiredLabels(payload) {
-
     const watchedRepo = this.watching[payload.repository.full_name];
 
     if( typeof watchedRepo !== 'undefined' ) {

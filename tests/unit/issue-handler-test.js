@@ -76,14 +76,17 @@ describe(`Issue Handler Tests`, function() {
 
   });
 
-  //describe('removing a label removes it from our Firebase list', function() {
-    //it('updates Firebase', function() {
+  describe(`Editing issues`, function() {
+    it(`updates the title on the client store`, function() {
+      store.addIssue.withArgs(issueForPayloadWithReqLabel).returns(true);
 
-      //var result = IssueHandler.issueUnlabeled(UnlabeledEvent);
-      //assert.ok(false, 'Need to confirm that we send the right info to mocked Firebase function');
-      //assert.ok(result, 'issue not properly removed');
-    //});
-  //});
+      const result = issueHandler.edit({payload: payloadWithReqLabel('edited')});
+
+      assert.equal(result, true, 'Record was saved');
+      store.addIssue.calledWith(issueForPayloadWithReqLabel);
+
+    });
+  });
 
   //describe('closing a label removes it from our Firebase list', function() {
     //it('updates Firebase', function () {

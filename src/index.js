@@ -39,7 +39,7 @@ handler.on('issues', function (event) {
     return;
   }
 
-  logging(action, event);
+  console.log(event);
   switch( event.payload.action ) {
     case 'edited':
       issueHandler.edit(event);
@@ -61,12 +61,3 @@ handler.on('issues', function (event) {
   }
 });
 
-function logging(type, event) {
-  console.log('Received an %s issue event for %s action=%s: #%d %s',
-    type,
-    event.payload.repository.name,
-    event.payload.action,
-    event.payload.issue.number,
-    event.payload.issue.title
-  );
-}
