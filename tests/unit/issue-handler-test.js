@@ -6,6 +6,7 @@ var assert = require('assert');
 var path = require('path');
 var sinon = require('sinon');
 
+var DataStore = require('../../lib/datastore-client');
 var IssueHandler = require('../../lib/issue-handler');
 var fakeEvent = require('../fixtures/unlabeled-event');
 
@@ -14,7 +15,10 @@ describe('adding a label to an issue', function() {
 
   it('updates Firebase', function() {
 
-    var addIssue = sinon.spy(IssueHandler, 'addIssueToDatastore');
+    //var addIssue = sinon.spy(new DataStore('test-host'), 'addIssue');
+    var dataStore = new DataStore('test-host');
+    var stub = sinon.stub(dataStore, 'addIssue').returns(true);
+
     var expectedIssueHash = {
       id: 1,
       url: 'https://github.com/emberjs/ember.js/issues/1',
@@ -27,13 +31,14 @@ describe('adding a label to an issue', function() {
       repo: 'emberjs/ember.js',
       repoUrl: 'https://github.com/emberjs/ember.js'
     };
+    //datastore.expects('addIssue').once().withArgs('emberjs/ember.js', 1, expectedIssueHash);
 
-    var result = IssueHandler.issueLabeled(fakeEvent);
+    var issueHandler = new IssueHandler(dataStore);
+    var result = issueHandler.issueLabeled(fakeEvent);
 
-    addIssue.restore();
-    sinon.assert.calledWith(addIssue, expectedIssueHash);
+    assert.equal(result, true, 'issue not properly sent to Firebase');
 
-    assert.ok(result, 'issue not properly sent to Firebase');
+    stub.restore();
   });
 });
 
