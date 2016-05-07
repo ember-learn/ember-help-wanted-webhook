@@ -8,17 +8,17 @@ export default class IssueHandler {
   }
 
   label(event) {
-    if (!this._hasOneOfDesiredLabels(event.payload)) {
+    if (!this._hasOneOfDesiredLabels(event)) {
       return false;
     }
 
-    const issueHash = this._constructIssueHash(event.payload);
+    const issueHash = this._constructIssueHash(event);
     return this._addIssueToDatastore(issueHash);
   }
 
   unlabel(event) {
-    const issue = this._constructIssueHash(event.payload);
-    if (this._hasOneOfDesiredLabels(event.payload)) {
+    const issue = this._constructIssueHash(event);
+    if (this._hasOneOfDesiredLabels(event)) {
       return this._addIssueToDatastore(issue);
     } else {
       return this._removeIssueFromDatastore(issue);
@@ -30,52 +30,25 @@ export default class IssueHandler {
   }
 
   close(event) {
-
-    if (this._hasOneOfDesiredLabels(event.payload)) {
-
-      // remove the issue from the Help Wanted system
-
-      this._removeIssueFromDatastore(repoName, issueId);
-
-    }
+    const issueHash = this._constructIssueHash(event);
+    return this._removeIssueFromDatastore(issueHash);
   }
 
   reopen(event) {
-
-    // make sure the re-opened issue has one of our key labels, then
-    if (this._hasOneOfDesiredLabels(event.payload)) {
-
-      // add the issue to Firebase again
-    }
+    return this.label(event);
   }
 
-    /**
-  *
-  * @param internalIssueHash
-  * @returns {boolean}
-  */
   _addIssueToDatastore(internalIssueHash) {
     // send our issue hash to Firebase (not the original Github issue)
     return this.dataStoreClient.addIssue(internalIssueHash);
   }
 
-    /**
-  *
-  * @param internalIssueHash
-  * @returns {boolean}
-  */
   _removeIssueFromDatastore(internalIssueHash) {
     // clean things up on Firebase
     return this.dataStoreClient.removeIssue(internalIssueHash);
   }
 
-    /**
-  * Whether our issue has one of the desired labels for this repo
-  *
-  * @param payload
-  * @returns {boolean}
-  */
-  _hasOneOfDesiredLabels(payload) {
+  _hasOneOfDesiredLabels({ payload }) {
     const watchedRepo = this.watching[payload.repository.full_name];
 
     if( typeof watchedRepo !== 'undefined' ) {
@@ -90,7 +63,7 @@ export default class IssueHandler {
     return false;
   }
 
-  _constructIssueHash(payload) {
+  _constructIssueHash({ payload }) {
 
     return {
       id: payload.issue.number,

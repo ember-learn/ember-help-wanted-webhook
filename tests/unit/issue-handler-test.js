@@ -45,7 +45,6 @@ describe(`Issue Handler Tests`, function() {
       store.addIssue.calledWith(issueForPayloadWithReqLabel);
     });
 
-
     it(`doesn't update the store when there's no valid label`, function() {
       const result = issueHandler.label({ payload: payloadWithoutReqLabel('labeled')});
 
@@ -82,50 +81,31 @@ describe(`Issue Handler Tests`, function() {
 
       const result = issueHandler.edit({payload: payloadWithReqLabel('edited')});
 
-      assert.equal(result, true, 'Record was saved');
+      assert.equal(result, true, 'Record was updated');
       store.addIssue.calledWith(issueForPayloadWithReqLabel);
 
     });
   });
 
-  //describe('closing a label removes it from our Firebase list', function() {
-    //it('updates Firebase', function () {
-      //var result = IssueHandler.issueClosed(UnlabeledEvent);
-      //assert.ok(result, 'issue not properly removed');
-      //assert.ok(false, 'Need to confirm that we send the right info to mocked Firebase function');
-    //});
-  //});
+  describe(`Closing issues`, function() {
+    it(`removes the title on the client store`, function() {
+      store.removeIssue.withArgs(issueForPayloadWithReqLabel).returns(true);
 
-  //describe('reopening a label adds it to our Firebase list', function() {
-    //it('updates Firebase', function () {
-      //var result = IssueHandler.issueReopened(UnlabeledEvent);
-      //assert.ok(result, 'issue not properly reopened');
-      //assert.ok(false, 'Need to confirm that we send the right info to mocked Firebase function');
-    //});
-  //});
+      const result = issueHandler.close({payload: payloadWithReqLabel('closed')});
 
-  //describe('renaming an issue updates its title on Firebase', function() {
-    //it('updates Firebase', function() {
-      //assert.ok(false, 'Need to confirm that title updates properly');
-    //});
-  //});
+      assert.equal(result, true, 'Record was removed');
+      store.removeIssue.calledWith(issueForPayloadWithReqLabel);
 
-  //describe('addIssueToDatastore updates Firebase as desired', function() {
-    //it('saving works', function () {
-      //assert.ok(false, 'Confirm that adding issues works');
-    //});
-  //});
+    });
+  });
 
-  //describe('removeIssueFromDatastore updates Firebase as desired', function() {
-    //it('deleting works', function () {
-      //assert.ok(false, 'Confirm that removing issues works');
-    //});
-  //});
-
-  //describe('updateIssueInDatastore updates Firebase as desired', function() {
-    //it('updating works', function () {
-      //assert.ok(false, 'Confirm that updating issues works');
-    //});
-  //});
+  describe(`Reopening issues`, function() {
+    it(`saves to the store when there's a valid label`, function() {
+      store.addIssue.withArgs(issueForPayloadWithReqLabel).returns(true);
+      const result = issueHandler.reopen({ payload: payloadWithReqLabel('reopened') });
+      assert.ok(result, 'Record is saved');
+      store.addIssue.calledWith(issueForPayloadWithReqLabel);
+    });
+  });
 
 });
