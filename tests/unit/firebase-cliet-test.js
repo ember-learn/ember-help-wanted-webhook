@@ -4,7 +4,7 @@ import assert from 'assert';
 import path from 'path';
 import sinon from 'sinon';
 
-import DataStore from '../../src/lib/datastore-client';
+import FirebaseClient from '../../src/lib/firebase-client';
 
 describe('adding an issue works', function() {
 

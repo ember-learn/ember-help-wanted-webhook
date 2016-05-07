@@ -1,4 +1,18 @@
 export default {
+  "issue": {
+    id: 1,
+    url: "https://github.com/emberjs/ember.js/issues/1",
+    title: "Testing issue",
+    labels: [
+      {
+        "url": "https://api.github.com/repos/emberjs/ember.js/labels/Needs%20Help",
+        "name": "Needs Help",
+        "color": "84b6eb"
+      }
+    ],
+    repo: "emberjs/ember.js",
+    repoUrl: "https://github.com/emberjs/ember.js",
+  },
   "payload": {
     "action": "unlabeled",
     "issue": {
