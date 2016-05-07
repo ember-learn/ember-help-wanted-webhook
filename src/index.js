@@ -1,30 +1,27 @@
 #!/usr/bin/env node
 // @TODO: remove when not needed
-var util = require('util');
+import util from 'util';
+import http from 'http';
+import createHandler from 'github-webhook-handler';
 
-var http = require('http');
-var createHandler = require('github-webhook-handler');
-var issueHandler = require('./lib/issue-handler');
+import configuration from './config';
 
-var config = {
-  ip: process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
-  path: '/issue-handler',
-  port: process.env.OPENSHIFT_NODEJS_PORT || 8080,
-  secret: process.env.WEBHOOK_SECRET || 'oursecrethere'
-};
+import IssueHandler from './lib/issue-handler';
+import FirebaseClient from './lib/firebase-client';
+import repos from './repos';
 
-var handler = createHandler({ path: config.path, secret: config.secret });
+const handler = createHandler(configuration.webhook);
+/*const dataStoreClient = new FirebaseClient(configuration.firebaseHost);*/
+/*const issueHandler = new IssueHandler(dataStoreClient, repos);*/
 
 http.createServer(function (req, res) {
   handler(req, res, function (err) {
     res.statusCode = 404;
     res.end('no such location');
   });
-}).listen(config.port, config.ip);
+}).listen(configuration.port, configuration.ip);
 
-handler.on('error', function (err) {
-  console.error('Error:', err.message);
-});
+handler.on('error', (err) =>  console.error('Error:', err.message) );
 
 handler.on('ping', function (event) {
   console.log('Received ping event for %s to %s',
@@ -34,22 +31,30 @@ handler.on('ping', function (event) {
 });
 
 handler.on('issues', function (event) {
+  const supportedActions = ['edited', 'labeled', 'unlabeled', 'closed', 'reopened'];
+  const action = event.payload.action;
+
+  if (supportedActions.indexOf(action) === -1) {
+    console.log(`Unsupported action: ${action}`);
+    return;
+  }
+
+  logging(action, event);
   switch( event.payload.action ) {
+    case 'edited':
+      issueHandler.edit(event);
+      break;
     case 'labeled':
-      logging('labeled', event);
-      issueHandler.issueLabeled(event);
+      issueHandler.label(event);
       break;
     case 'unlabeled':
-      logging('unlabeled', event);
-      issueHandler.issueUnlabeled(event);
+      issueHandler.unlabel(event);
       break;
     case 'closed':
-      logging('closed', event);
-      issueHandler.issueClosed(event);
+      issueHandler.close(event);
       break;
     case 'reopened':
-      logging('reopened', event);
-      issueHandler.issueReopened(event);
+      issueHandler.reopen(event);
       break;
     default:
       // we don't want to do anything in other cases

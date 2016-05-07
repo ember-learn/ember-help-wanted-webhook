@@ -1,94 +1,86 @@
 /* jshint node: true */
-'use strict';
 
-var DataStore = require('./datastore-client');
+export default class IssueHandler {
 
-module.exports = {
+  constructor(dataStoreClient, repos) {
+    this.dataStoreClient = dataStoreClient;
+    this.watching =  repos;
+  }
 
-  watching: {
-    'acorncom/ember-hitlist-tester': {
-      labels: [
-        'Help Wanted'
-      ]
-    },
-    'emberjs/ember.js': {
-      labels: [
-        'Needs Help',
-        'Good for New Contributors'
-      ]
-    }
-  },
+  create(event) {
+      return true;
+  }
 
-  issueLabeled: function (event) {
-    var results = this.hasOneOfDesiredLabels(event.payload);
+  labeled(event) {
+    var results = this._hasOneOfDesiredLabels(event.payload);
     if (!results) {
       return false;
     }
 
-    var issueHash = this.constructIssueHash(event.payload);
-    return this.addIssueToDatastore(issueHash);
-  },
+    var issueHash = this._constructIssueHash(event.payload);
+    return this._addIssueToDatastore(issueHash);
+  }
 
-  issueUnlabeled: function (event) {
+  unlabeled(event) {
 
-    if (this.removedOneOfDesiredLabels(event.payload)) {
+    if (this._removedOneOfDesiredLabels(event.payload)) {
 
-      var issue = this.constructIssueHash(event.payload);
-
-      // remove the issue from the Help Wanted system
-      return this.removeIssueFromDatastore(issue);
-    }
-  },
-
-  issueClosed: function (event) {
-
-    if (this.hasOneOfDesiredLabels(event.payload)) {
+      var issue = this._constructIssueHash(event.payload);
 
       // remove the issue from the Help Wanted system
+      return this._removeIssueFromDatastore(issue);
+    }
+  }
 
-      this.removeIssueFromDatastore(repoName, issueId);
+  closed(event) {
+
+    if (this._hasOneOfDesiredLabels(event.payload)) {
+
+      // remove the issue from the Help Wanted system
+
+      this._removeIssueFromDatastore(repoName, issueId);
 
     }
-  },
+  }
 
-  issueReopened: function (event) {
+  reopened(event) {
 
     // make sure the re-opened issue has one of our key labels, then
-    if (this.hasOneOfDesiredLabels(event.payload)) {
+    if (this._hasOneOfDesiredLabels(event.payload)) {
 
       // add the issue to Firebase again
     }
-  },
+  }
 
-  /**
-   *
-   * @param internalIssueHash
-   * @returns {boolean}
-     */
-  addIssueToDatastore: function (internalIssueHash) {
+    /**
+  *
+  * @param internalIssueHash
+  * @returns {boolean}
+  */
+  _addIssueToDatastore(internalIssueHash) {
 
     // send our issue hash to Firebase (not the original Github issue)
-    return DataStore.addIssue(internalIssueHash.repo, internalIssueHash.id, internalIssueHash);
-  },
+    return this.dataStoreClient.addIssue(internalIssueHash.repo, internalIssueHash.id, internalIssueHash);
+  }
 
-  /**
-   *
-   * @param internalIssueHash
-   * @returns {boolean}
-     */
-  removeIssueFromDatastore: function (internalIssueHash) {
+    /**
+  *
+  * @param internalIssueHash
+  * @returns {boolean}
+  */
+  _removeIssueFromDatastore(internalIssueHash) {
 
     // clean things up on Firebase
     return true;
-  },
+  }
 
-  /**
-   * Whether our issue has one of the desired labels for this repo
-   *
-   * @param payload
-   * @returns {boolean}
-   */
-  hasOneOfDesiredLabels: function (payload) {
+    /**
+  * Whether our issue has one of the desired labels for this repo
+  *
+  * @param payload
+  * @returns {boolean}
+  */
+  _hasOneOfDesiredLabels(payload) {
 
     var watchedRepo = this.watching[payload.repository.full_name];
 
@@ -102,19 +94,19 @@ module.exports = {
     }
 
     return false;
-  },
+  }
 
-  /**
-   * Whether our issue has one of our watched labels
-   *
-   * @param payload
-   * @returns {boolean}
-     */
-  removedOneOfDesiredLabels: function(payload) {
+    /**
+  * Whether our issue has one of our watched labels
+  *
+  * @param payload
+  * @returns {boolean}
+  */
+  _removedOneOfDesiredLabels(payload) {
     return true;
-  },
+  }
 
-  constructIssueHash: function (payload) {
+  _constructIssueHash(payload) {
 
     return {
       id: payload.issue.number,
@@ -126,4 +118,5 @@ module.exports = {
     };
 
   }
+
 };

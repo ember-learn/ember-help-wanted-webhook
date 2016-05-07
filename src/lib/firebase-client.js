@@ -1,12 +1,16 @@
 /**
  * Created by dbaker on 5/2/16.
  */
-var firebase = require("firebase");
-var firebaseHost = process.env.FIREBASE_APP || '"https://<app-name>.firebaseio.com/";';
+import firebase from "firebase";
 
-module.exports = {
-  addIssue: function(repo, issueId, payload) {
-    var ref = this._setupFirebase(firebaseHost);
+export class FirebaseClient {
+
+  constructor(firebaseHost) {
+    this.client = this._setupFirebase(firebaseHost);
+  }
+
+  addIssue(repo, issueId, payload) {
+    var ref = this.client;
     //ref.authWithCustomToken(AUTH_TOKEN, function(error, authData) {
 
     repo = this._modifyRepoNameIfNeeded(repo);
@@ -22,17 +26,18 @@ module.exports = {
 
     return true;
 //    return process.env['FIREBASE_SECRET'];
-  },
+  }
 
-  _setupFirebase: function(host) {
+  _setupFirebase(host) {
     return new firebase(host);
-  },
+  }
 
-  _modifyRepoNameIfNeeded: function(repo) {
+  _modifyRepoNameIfNeeded(repo) {
     return repo.replace('.', '');
-  },
+  }
 
-  _getStoreReference: function(ref, path) {
+  _getStoreReference(ref, path) {
     return ref.child(path);
   }
+
 };
