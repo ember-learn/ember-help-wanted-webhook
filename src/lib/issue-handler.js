@@ -8,7 +8,6 @@ export default class IssueHandler {
   }
 
   label(event) {
-    debugger;
     const results = this._hasOneOfDesiredLabels(event.payload);
     if (!results) {
       return false;
@@ -18,10 +17,8 @@ export default class IssueHandler {
     return this._addIssueToDatastore(issueHash);
   }
 
-  unlabeled(event) {
-
+  unlabel(event) {
     if (this._removedOneOfDesiredLabels(event.payload)) {
-
       var issue = this._constructIssueHash(event.payload);
 
       // remove the issue from the Help Wanted system
@@ -29,7 +26,7 @@ export default class IssueHandler {
     }
   }
 
-  closed(event) {
+  close(event) {
 
     if (this._hasOneOfDesiredLabels(event.payload)) {
 
@@ -40,7 +37,7 @@ export default class IssueHandler {
     }
   }
 
-  reopened(event) {
+  reopen(event) {
 
     // make sure the re-opened issue has one of our key labels, then
     if (this._hasOneOfDesiredLabels(event.payload)) {

@@ -10,7 +10,8 @@ import IssueHandler from '../../src/lib/issue-handler';
 import unlabeledEvent from '../fixtures/unlabeled-event';
 import {
   issue as labeledIssue,
-  payload as labeledPayload
+  payload as labeledPayload,
+  payloadWithoutReqLabel
 } from '../fixtures/labeled-event';
 import repos from '../../src/repos';
 
@@ -32,7 +33,8 @@ describe(`Issue Handler Tests`, function() {
   });
 
   describe(`Adding a label to an issue`, function() {
-    it(`it updates store`, function() {
+
+    it(`updates the store when there's a valid label`, function() {
       store.addIssue.withArgs(labeledIssue).returns(true);
 
       const result = issueHandler.label({ payload: labeledPayload });
@@ -40,13 +42,16 @@ describe(`Issue Handler Tests`, function() {
       assert.ok(result, 'Record is saved');
       store.addIssue.calledWith(labeledIssue);
     });
-  });
 
-/*  describe('Adding a label to an issue', function() {*/
-    //it('updates store', function() {
-      //assert.ok(issueHandler.label);
-    //});
-  /*});*/
+
+    it(`doesn't update the store when there's no valid label`, function() {
+      const result = issueHandler.label({ payload: payloadWithoutReqLabel});
+
+      assert.equal(result, false, 'Record was discarded');
+      assert.equal(store.addIssue.callCount, 0, `Store shouldn't be called for discarded payloads`);
+    });
+
+  });
 
   //describe('removing a label removes it from our Firebase list', function() {
     //it('updates Firebase', function() {
