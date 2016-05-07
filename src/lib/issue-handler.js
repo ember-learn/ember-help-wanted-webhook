@@ -18,10 +18,10 @@ export default class IssueHandler {
   }
 
   unlabel(event) {
-    if (this._removedOneOfDesiredLabels(event.payload)) {
-      var issue = this._constructIssueHash(event.payload);
-
-      // remove the issue from the Help Wanted system
+    const issue = this._constructIssueHash(event.payload);
+    if (this._hasOneOfDesiredLabels(event.payload)) {
+      return this._addIssueToDatastore(issue);
+    } else {
       return this._removeIssueFromDatastore(issue);
     }
   }
@@ -64,7 +64,7 @@ export default class IssueHandler {
   _removeIssueFromDatastore(internalIssueHash) {
 
     // clean things up on Firebase
-    return this.dataStoreClient.removeIssue(internalIssueHash.repo, internalIssueHash.id, internalIssueHash);
+    return this.dataStoreClient.removeIssue(internalIssueHash);
   }
 
     /**
@@ -83,20 +83,10 @@ export default class IssueHandler {
         return watchedRepo.labels.indexOf(label.name) !== -1;
       });
 
-      return ( result.length );
+      return (result.length > 0);
     }
 
     return false;
-  }
-
-    /**
-  * Whether our issue has one of our watched labels
-  *
-  * @param payload
-  * @returns {boolean}
-  */
-  _removedOneOfDesiredLabels(payload) {
-    return true;
   }
 
   _constructIssueHash(payload) {

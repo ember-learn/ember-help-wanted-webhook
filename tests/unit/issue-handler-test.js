@@ -7,13 +7,15 @@ import path from 'path';
 import sinon from 'sinon';
 
 import IssueHandler from '../../src/lib/issue-handler';
-import unlabeledEvent from '../fixtures/unlabeled-event';
-import {
-  issue as labeledIssue,
-  payload as labeledPayload,
-  payloadWithoutReqLabel
-} from '../fixtures/labeled-event';
+import fixtures from '../fixtures';
 import repos from '../../src/repos';
+
+const {
+  payloadWithReqLabel,
+  payloadWithoutReqLabel,
+  issueForPayloadWithReqLabel,
+  issueForPayloadWithoutReqLabel
+} = fixtures;
 
 describe(`Issue Handler Tests`, function() {
 
@@ -22,7 +24,8 @@ describe(`Issue Handler Tests`, function() {
 
   beforeEach(function() {
       let dummyStore = {
-        addIssue() {}
+        addIssue() {},
+        removeIssue() {}
       };
       store = sinon.stub(dummyStore);
       issueHandler = new IssueHandler(store, repos);
@@ -30,25 +33,45 @@ describe(`Issue Handler Tests`, function() {
 
   afterEach(function() {
       store.addIssue.restore();
+      store.removeIssue.restore();
   });
 
   describe(`Adding a label to an issue`, function() {
 
     it(`updates the store when there's a valid label`, function() {
-      store.addIssue.withArgs(labeledIssue).returns(true);
-
-      const result = issueHandler.label({ payload: labeledPayload });
-
+      store.addIssue.withArgs(issueForPayloadWithReqLabel).returns(true);
+      const result = issueHandler.label({ payload: payloadWithReqLabel('labeled') });
       assert.ok(result, 'Record is saved');
-      store.addIssue.calledWith(labeledIssue);
+      store.addIssue.calledWith(issueForPayloadWithReqLabel);
     });
 
 
     it(`doesn't update the store when there's no valid label`, function() {
-      const result = issueHandler.label({ payload: payloadWithoutReqLabel});
+      const result = issueHandler.label({ payload: payloadWithoutReqLabel('labeled')});
 
       assert.equal(result, false, 'Record was discarded');
       assert.equal(store.addIssue.callCount, 0, `Store shouldn't be called for discarded payloads`);
+    });
+
+  });
+
+  describe(`Unlabeling issues`, function() {
+
+    it(`removes the issue from the store when it no longer has a valid label`, function() {
+      store.removeIssue.withArgs(issueForPayloadWithoutReqLabel).returns(true);
+
+      const result = issueHandler.unlabel({ payload: payloadWithoutReqLabel('unlabeled')});
+      assert.ok(result, 'Record is removed');
+      store.removeIssue.calledWith(issueForPayloadWithoutReqLabel);
+    });
+
+
+    it(`saves the issue when there's still a valid label after a unlabel event`, function() {
+      store.addIssue.withArgs(issueForPayloadWithReqLabel).returns(true);
+      const result = issueHandler.unlabel({ payload: payloadWithReqLabel('unlabeled')});
+
+      assert.equal(result, true, 'Record was discarded');
+      store.addIssue.calledWith(issueForPayloadWithReqLabel);
     });
 
   });

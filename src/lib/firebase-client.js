@@ -30,6 +30,10 @@ export class FirebaseClient {
 //    return process.env['FIREBASE_SECRET'];
   }
 
+  removeIssue(issue) {
+    return false;
+  }
+
   _setupFirebase(host) {
     return new firebase(host);
   }
