@@ -4,9 +4,11 @@ var util = require('util');
 
 var http = require('http');
 var createHandler = require('github-webhook-handler');
-var issueHandler = require('./lib/issue-handler');
+var DataStore = require('./lib/datastore-client');
+var IssueHandler = require('./lib/issue-handler');
 
 var config = {
+  firebaseHost: process.env.FIREBASE_APP || 'https://<app-name>.firebaseio.com/',
   ip: process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
   path: '/issue-handler',
   port: process.env.OPENSHIFT_NODEJS_PORT || 8080,
@@ -34,6 +36,10 @@ handler.on('ping', function (event) {
 });
 
 handler.on('issues', function (event) {
+
+  var dataStore = new DataStore();
+  var issueHandler = new IssueHandler(dataStore);
+
   switch( event.payload.action ) {
     case 'labeled':
       logging('labeled', event);
