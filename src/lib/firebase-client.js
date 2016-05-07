@@ -9,14 +9,16 @@ export class FirebaseClient {
     this.client = this._setupFirebase(firebaseHost);
   }
 
-  addIssue(repo, issueId, payload) {
+  addIssue(issue) {
+    var repo = issue.repo;
+    var issueId = issue.id;
     var ref = this.client;
     //ref.authWithCustomToken(AUTH_TOKEN, function(error, authData) {
 
     repo = this._modifyRepoNameIfNeeded(repo);
     var path = 'issues/' + repo + '/' + issueId
     var issueRef = this._getStoreReference(ref, path);
-    issueRef.set(payload, function(error) {
+    issueRef.set(issue, function(error) {
       if (error) {
         console.log('failures' + error);
         return false;

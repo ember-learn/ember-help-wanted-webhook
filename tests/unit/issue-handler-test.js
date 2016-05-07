@@ -17,20 +17,28 @@ import repos from '../../src/repos';
 describe(`Issue Handler Tests`, function() {
 
   var issueHandler;
-  var storeStub;
+  var store;
 
   beforeEach(function() {
-    let dummyStore = {
-      create(issue) {},
-    };
-    storeStub = sinon.stub(dummyStore);
-    issueHandler = new IssueHandler(storeStub, repos);
+      let dummyStore = {
+        addIssue() {}
+      };
+      store = sinon.stub(dummyStore);
+      issueHandler = new IssueHandler(store, repos);
   });
 
-  describe(`Create a new issue`, function() {
-    it(`requests store to create a new issue`, function() {
-      assert.ok(issueHandler.create(labeledPayload), 'Record is created');
-      storeStub.calledWith(labeledIssue);
+  afterEach(function() {
+      store.addIssue.restore();
+  });
+
+  describe(`Adding a label to an issue`, function() {
+    it(`it updates store`, function() {
+      store.addIssue.withArgs(labeledIssue).returns(true);
+
+      const result = issueHandler.label({ payload: labeledPayload });
+
+      assert.ok(result, 'Record is saved');
+      store.addIssue.calledWith(labeledIssue);
     });
   });
 

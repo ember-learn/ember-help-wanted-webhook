@@ -7,17 +7,14 @@ export default class IssueHandler {
     this.watching =  repos;
   }
 
-  create(event) {
-      return true;
-  }
-
-  labeled(event) {
-    var results = this._hasOneOfDesiredLabels(event.payload);
+  label(event) {
+    debugger;
+    const results = this._hasOneOfDesiredLabels(event.payload);
     if (!results) {
       return false;
     }
 
-    var issueHash = this._constructIssueHash(event.payload);
+    const issueHash = this._constructIssueHash(event.payload);
     return this._addIssueToDatastore(issueHash);
   }
 
@@ -58,9 +55,8 @@ export default class IssueHandler {
   * @returns {boolean}
   */
   _addIssueToDatastore(internalIssueHash) {
-
     // send our issue hash to Firebase (not the original Github issue)
-    return this.dataStoreClient.addIssue(internalIssueHash.repo, internalIssueHash.id, internalIssueHash);
+    return this.dataStoreClient.addIssue(internalIssueHash);
   }
 
     /**
@@ -71,7 +67,7 @@ export default class IssueHandler {
   _removeIssueFromDatastore(internalIssueHash) {
 
     // clean things up on Firebase
-    return true;
+    return this.dataStoreClient.removeIssue(internalIssueHash.repo, internalIssueHash.id, internalIssueHash);
   }
 
     /**
@@ -82,7 +78,7 @@ export default class IssueHandler {
   */
   _hasOneOfDesiredLabels(payload) {
 
-    var watchedRepo = this.watching[payload.repository.full_name];
+    const watchedRepo = this.watching[payload.repository.full_name];
 
     if( typeof watchedRepo !== 'undefined' ) {
 
