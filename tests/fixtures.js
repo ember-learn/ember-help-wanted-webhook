@@ -101,5 +101,17 @@ export default {
       "color": "84b6eb"
     };
     return issue;
-})()
+  })(),
+
+  issueForPayloadWithSplRepoName: baseIssue,
+
+  issueForPayloadWithNormalRepoName: (function() {
+    let issue = cloneObject(baseIssue);
+    issue.url = issue.url.replace('ember.js', 'api-docs');
+    issue.labels[0].url = issue.labels[0].url.replace('ember.js', 'api-docs');
+    issue.repoUrl = issue.repoUrl.replace('ember.js', 'api-docs');
+    issue.repo = issue.repo.replace('ember.js', 'api-docs');
+    return issue;
+  })(),
+
 }

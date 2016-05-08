@@ -3,11 +3,12 @@
 import util from 'util';
 import http from 'http';
 import createHandler from 'github-webhook-handler';
+import Firebase from "firebase";
 
 import configuration from './config';
 
 import IssueHandler from './lib/issue-handler';
-import FirebaseClient from './lib/firebase-client';
+import DataStore from './lib/data-store';
 import repos from './repos';
 
 const handler = createHandler(configuration.webhook);
