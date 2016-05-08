@@ -9,28 +9,12 @@ export default class DataStore {
 
   addIssue(issue) {
     const issueRef = this._getStoreReference(issue);
-    issueRef.set(issue, function(error) {
-      if (error) {
-        console.log('failures' + error);
-        return false;
-      }
-      return true;
-    });
-
-    return true;
+    return issueRef.set(issue);
   }
 
   removeIssue(issue) {
     const issueRef = this._getStoreReference(issue);
-    issueRef.remove(function(error) {
-      if (error) {
-        console.log('failures' + error);
-        return false;
-      }
-      return true;
-    });
-
-    return true;
+    return issueRef.remove();
   }
 
   _modifyRepoNameIfNeeded(repo) {

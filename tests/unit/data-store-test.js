@@ -2,6 +2,7 @@
 /* jshint mocha: true */
 import assert from 'assert';
 import sinon from 'sinon';
+import Promise from 'bluebird';
 
 import Fixtures from '../fixtures';
 import DataStore from '../../src/lib/data-store';
@@ -34,53 +35,51 @@ describe(`DataStore Tests`, function() {
 
   describe(`Adding an issue works`, function() {
 
-    const testIssueAddition = (childRefPath, issue) => {
-
+    const testIssueAddition = (childRefPath, issue, done) => {
       fakeClient.child.withArgs(childRefPath).returns(fakeClient);
-      fakeClient.set.withArgs(issue, callBackFn).returns(null);
+      fakeClient.set.withArgs(issue).returns(Promise.resolve());
 
       let dataStore = new DataStore(fakeClient);
-      const result = dataStore.addIssue(issue, callBackFn);
-
-      fakeClient.child.calledWith(childRefPath);
-      fakeClient.set.calledWith(issue, callBackFn);
-      assert.ok(result, 'Entry was added');
-
+      dataStore.addIssue(issue).then(function() {
+        assert.ok(fakeClient.child.calledWith(childRefPath));
+        assert.ok(fakeClient.set.calledWith(issue));
+        assert.ok(true, 'Entry was added');
+        done();
+      });
     };
 
-    it(`when the repo name is normal`, function() {
-      testIssueAddition('issues/emberjs/api-docs/1', issueForPayloadWithNormalRepoName);
+    it(`when the repo name is normal`, function(done) {
+      testIssueAddition('issues/emberjs/api-docs/1', issueForPayloadWithNormalRepoName, done);
     });
 
 
-    it(`when the repo name has a period in it`, function() {
-      testIssueAddition('issues/emberjs/emberjs/1', issueForPayloadWithSplRepoName);
+    it(`when the repo name has a period in it`, function(done) {
+      testIssueAddition('issues/emberjs/emberjs/1', issueForPayloadWithSplRepoName, done);
     });
 
   });
 
   describe(`Removing an issue works`, function() {
 
-    const testIssueRemoval = (childRefPath, issue) => {
-
+    const testIssueRemoval = (childRefPath, issue, done) => {
       fakeClient.child.withArgs(childRefPath).returns(fakeClient);
-      fakeClient.remove.withArgs(callBackFn).returns(null);
+      fakeClient.remove.returns(Promise.resolve());
 
       let dataStore = new DataStore(fakeClient);
-      const result = dataStore.removeIssue(issue, callBackFn);
-
-      fakeClient.child.calledWith(childRefPath);
-      fakeClient.remove.calledWith(callBackFn);
-      assert.ok(result, 'Entry was added');
-
+      dataStore.removeIssue(issue).then(function() {
+        assert.ok(fakeClient.child.calledWith(childRefPath));
+        assert.ok(fakeClient.remove.called, 'Firebase remove api was called');
+        assert.ok(true, 'Entry was added');
+        done();
+      });
     };
-    it(`when the repo name is normal`, function() {
-      testIssueRemoval('issues/emberjs/api-docs/1', issueForPayloadWithNormalRepoName);
+
+    it(`when the repo name is normal`, function(done) {
+      testIssueRemoval('issues/emberjs/api-docs/1', issueForPayloadWithNormalRepoName, done);
     });
 
-
-    it(`when the repo name has a period in it`, function() {
-      testIssueRemoval('issues/emberjs/emberjs/1', issueForPayloadWithSplRepoName);
+    it(`when the repo name has a period in it`, function(done) {
+      testIssueRemoval('issues/emberjs/emberjs/1', issueForPayloadWithSplRepoName, done);
     });
 
   });

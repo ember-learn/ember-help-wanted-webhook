@@ -3,6 +3,8 @@ export default {
     labels: [
       'help wanted',
       'a11y',
+      'bug',
+      'question',
     ]
   },
   'acorncom/ember-hitlist-tester': {

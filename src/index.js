@@ -6,14 +6,14 @@ import createHandler from 'github-webhook-handler';
 import Firebase from "firebase";
 
 import configuration from './config';
-
 import IssueHandler from './lib/issue-handler';
 import DataStore from './lib/data-store';
 import repos from './repos';
 
 const handler = createHandler(configuration.webhook);
-/*const dataStoreClient = new FirebaseClient(configuration.firebaseHost);*/
-/*const issueHandler = new IssueHandler(dataStoreClient, repos);*/
+const firebaseClient = new Firebase(configuration.firebaseHost);
+const dataStore = new DataStore(firebaseClient);
+const issueHandler = new IssueHandler(dataStore, repos);
 
 http.createServer(function (req, res) {
   handler(req, res, function (err) {
@@ -41,24 +41,32 @@ handler.on('issues', function (event) {
   }
 
   console.log(event);
+
+  let op;
   switch( event.payload.action ) {
     case 'edited':
-      issueHandler.edit(event);
+      op = issueHandler.edit(event);
       break;
     case 'labeled':
-      issueHandler.label(event);
+      op = issueHandler.label(event);
       break;
     case 'unlabeled':
-      issueHandler.unlabel(event);
+      op =  issueHandler.unlabel(event);
       break;
     case 'closed':
-      issueHandler.close(event);
+      op = issueHandler.close(event);
       break;
     case 'reopened':
-      issueHandler.reopen(event);
+      op = issueHandler.reopen(event);
       break;
     default:
-      // we don't want to do anything in other cases
+      return
   }
+
+  op.then(function() {
+    console.info('Success');
+  }, function(reason) {
+    console.error('Failed', reason);
+  });
 });
 

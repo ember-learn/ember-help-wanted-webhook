@@ -1,4 +1,6 @@
 /* jshint node: true */
+import Promise from 'bluebird';
+
 
 export default class IssueHandler {
 
@@ -9,7 +11,7 @@ export default class IssueHandler {
 
   label(event) {
     if (!this._hasOneOfDesiredLabels(event)) {
-      return false;
+      return Promise.reject(`Doesn't have a label we're monitoring`);
     }
 
     const issueHash = this._constructIssueHash(event);
