@@ -9,6 +9,8 @@ import configuration from './config';
 import IssueHandler from './lib/issue-handler';
 import DataStore from './lib/data-store';
 import repos from './repos';
+import {logger} from './lib/logger';
+
 
 const handler = createHandler(configuration.webhook);
 const firebaseClient = new Firebase(configuration.firebaseHost);
@@ -22,10 +24,10 @@ http.createServer(function (req, res) {
   });
 }).listen(configuration.port, configuration.ip);
 
-handler.on('error', (err) =>  console.error('Error:', err.message) );
+handler.on('error', (err) =>  logger.error('Error:', err.message) );
 
 handler.on('ping', function (event) {
-  console.log('Received ping event for %s to %s',
+  logger.info('Received ping event for %s to %s',
     event.payload.repository.name,
     util.inspect(event.payload.hook, false, null)
   );
@@ -36,11 +38,11 @@ handler.on('issues', function (event) {
   const action = event.payload.action;
 
   if (supportedActions.indexOf(action) === -1) {
-    console.log(`Unsupported action: ${action}`);
+    logger.debug(`Unsupported action: ${action}`);
     return;
   }
 
-  console.log(event);
+  logger.info(event);
 
   let op;
   switch( event.payload.action ) {
@@ -64,9 +66,9 @@ handler.on('issues', function (event) {
   }
 
   op.then(function() {
-    console.info('Success');
+    logger.info('Success', event.payload.issue.id);
   }, function(reason) {
-    console.error('Failed', reason);
+    logger.error('Failed', reason, event.payload.issue.id);
   });
 });
 
