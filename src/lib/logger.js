@@ -8,7 +8,7 @@ export const logger = bunyan.createLogger({
     stream: process.stdout
   }, {
     level: 'info',
-    path: './logs/events.log',
+    path: `${process.env.OPENSHIFT_LOG_DIR}events.log` || './logs/events.log',
     type: 'rotating-file'
   }]
 });
