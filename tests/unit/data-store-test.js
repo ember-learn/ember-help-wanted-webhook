@@ -8,7 +8,6 @@ import Fixtures from '../fixtures';
 import DataStore from '../../src/lib/data-store';
 
 const {
-  issueForPayloadWithSplRepoName,
   issueForPayloadWithNormalRepoName
 } = Fixtures;
 
@@ -49,12 +48,7 @@ describe(`DataStore Tests`, function() {
     };
 
     it(`when the repo name is normal`, function(done) {
-      testIssueAddition('issues/emberjs/api-docs/1', issueForPayloadWithNormalRepoName, done);
-    });
-
-
-    it(`when the repo name has a period in it`, function(done) {
-      testIssueAddition('issues/emberjs/emberjs/1', issueForPayloadWithSplRepoName, done);
+      testIssueAddition('issues/123456/github_data', issueForPayloadWithNormalRepoName, done);
     });
 
   });
@@ -75,11 +69,7 @@ describe(`DataStore Tests`, function() {
     };
 
     it(`when the repo name is normal`, function(done) {
-      testIssueRemoval('issues/emberjs/api-docs/1', issueForPayloadWithNormalRepoName, done);
-    });
-
-    it(`when the repo name has a period in it`, function(done) {
-      testIssueRemoval('issues/emberjs/emberjs/1', issueForPayloadWithSplRepoName, done);
+      testIssueRemoval('issues/123456/github_data', issueForPayloadWithNormalRepoName, done);
     });
 
   });

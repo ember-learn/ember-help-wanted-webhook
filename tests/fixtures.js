@@ -56,18 +56,19 @@ const basePayload = {
 };
 
 const baseIssue = {
-  id: 1,
-  url: "https://github.com/emberjs/ember.js/issues/1",
+  id: 123456,
+  number: 1,
   title: "Testing issue",
   labels: [
     {
-      "url": "https://api.github.com/repos/emberjs/ember.js/labels/Needs%20Help",
       "name": "Needs Help",
       "color": "84b6eb"
     }
   ],
-  repo: "emberjs/ember.js",
-  repoUrl: "https://github.com/emberjs/ember.js",
+  org: "emberjs",
+  repo: "ember.js",
+  createdAt: "2016-04-23T20:27:21Z",
+  updatedAt: "2016-04-23T21:35:03Z",
 };
 
 export default {
@@ -96,22 +97,12 @@ export default {
   issueForPayloadWithoutReqLabel: (function() {
     let issue = cloneObject(baseIssue);
     issue.labels[0] = {
-      "url": "https://api.github.com/repos/emberjs/ember.js/labels/i18n",
       "name": "i18n",
       "color": "84b6eb"
     };
     return issue;
   })(),
 
-  issueForPayloadWithSplRepoName: baseIssue,
-
-  issueForPayloadWithNormalRepoName: (function() {
-    let issue = cloneObject(baseIssue);
-    issue.url = issue.url.replace('ember.js', 'api-docs');
-    issue.labels[0].url = issue.labels[0].url.replace('ember.js', 'api-docs');
-    issue.repoUrl = issue.repoUrl.replace('ember.js', 'api-docs');
-    issue.repo = issue.repo.replace('ember.js', 'api-docs');
-    return issue;
-  })(),
+  issueForPayloadWithNormalRepoName : baseIssue
 
 }
