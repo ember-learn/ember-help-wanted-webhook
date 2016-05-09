@@ -9,7 +9,14 @@ import Promise from 'bluebird'
 
 import IssueHandler from '../../src/lib/issue-handler';
 import fixtures from '../fixtures';
-import repos from '../../src/repos';
+
+const repos ={
+  'emberjs-blr/github-webhook-test-repo': {
+    labels: [
+      'bug',
+    ]
+  }
+};
 
 const {
   payloadWithReqLabel,
@@ -41,6 +48,7 @@ describe(`Issue Handler Tests`, function() {
 
     it(`updates the store when there's a valid label`, function(done) {
       store.addIssue.withArgs(issueForPayloadWithReqLabel).returns(Promise.resolve(true));
+      console.log(issueForPayloadWithReqLabel);
       issueHandler.label({ payload: payloadWithReqLabel('labeled') }).then(function() {
         assert.ok(true, 'Record is saved');
         assert.ok(store.addIssue.calledWith(issueForPayloadWithReqLabel));
