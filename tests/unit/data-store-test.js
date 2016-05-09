@@ -32,6 +32,8 @@ describe(`DataStore Tests`, function() {
     fakeClient.remove.restore();
   });
 
+const issueKey = 'issues/153841776/github_data';
+
   describe(`Adding an issue works`, function() {
 
     const testIssueAddition = (childRefPath, issue, done) => {
@@ -48,7 +50,7 @@ describe(`DataStore Tests`, function() {
     };
 
     it(`when the repo name is normal`, function(done) {
-      testIssueAddition('issues/123456/github_data', issueForPayloadWithNormalRepoName, done);
+      testIssueAddition(issueKey, issueForPayloadWithNormalRepoName, done);
     });
 
   });
@@ -69,7 +71,7 @@ describe(`DataStore Tests`, function() {
     };
 
     it(`when the repo name is normal`, function(done) {
-      testIssueRemoval('issues/123456/github_data', issueForPayloadWithNormalRepoName, done);
+      testIssueRemoval(issueKey, issueForPayloadWithNormalRepoName, done);
     });
 
   });

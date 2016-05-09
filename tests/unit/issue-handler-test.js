@@ -48,7 +48,6 @@ describe(`Issue Handler Tests`, function() {
 
     it(`updates the store when there's a valid label`, function(done) {
       store.addIssue.withArgs(issueForPayloadWithReqLabel).returns(Promise.resolve(true));
-      console.log(issueForPayloadWithReqLabel);
       issueHandler.label({ payload: payloadWithReqLabel('labeled') }).then(function() {
         assert.ok(true, 'Record is saved');
         assert.ok(store.addIssue.calledWith(issueForPayloadWithReqLabel));

@@ -14,7 +14,6 @@ export default class IssueHandler {
       return Promise.reject(`Doesn't have a label we're monitoring`);
     }
     const issueHash = this._constructIssueHash(event);
-console.log('\n', issueHash);
     return this._addIssueToDatastore(issueHash);
   }
 
