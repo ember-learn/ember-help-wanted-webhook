@@ -32,7 +32,7 @@ describe(`DataStore Tests`, function() {
     fakeClient.remove.restore();
   });
 
-const issueKey = 'issues/153841776/github_data';
+const issueKey = 'issues/153841776/githubData';
 
   describe(`Adding an issue works`, function() {
 

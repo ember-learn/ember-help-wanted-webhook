@@ -26,7 +26,7 @@ export default class DataStore {
       id:issueId
     } = issue;
 
-    const path = `issues/${issueId}/github_data`;
+    const path = `issues/${issueId}/githubData`;
     return this.client.child(path);
   }
 
