@@ -21,19 +21,12 @@ export default class DataStore {
     return issueRef.remove();
   }
 
-  _modifyRepoNameIfNeeded(repo) {
-    return repo.replace('.', '');
-  }
-
   _getStoreReference(issue) {
     let {
-      repo:repoName,
       id:issueId
     } = issue;
 
-    repoName = this._modifyRepoNameIfNeeded(repoName);
-
-    const path = `issues/${repoName}/${issueId}`;
+    const path = `issues/${issueId}/github_data`;
     return this.client.child(path);
   }
 

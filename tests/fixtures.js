@@ -5,69 +5,69 @@ const cloneObject = (object) => {
 const basePayload = {
   "action": "labeled",
   "issue": {
-    "html_url": "https://github.com/emberjs/ember.js/issues/1",
+    "id": 153841776,
     "number": 1,
+    "title": "test1",
     "user": {
-      "login": "acorncom",
-      "id": 802505,
-      "avatar_url": "https://avatars.githubusercontent.com/u/802505?v=3",
+      "login": "sivakumar-kailasam",
+      "id": 604117,
+      "avatar_url": "https://avatars.githubusercontent.com/u/604117?v=3",
       "gravatar_id": "",
-      "url": "https://api.github.com/users/acorncom",
-      "html_url": "https://github.com/acorncom",
-      "followers_url": "https://api.github.com/users/acorncom/followers",
-      "following_url": "https://api.github.com/users/acorncom/following{/other_user}",
-      "gists_url": "https://api.github.com/users/acorncom/gists{/gist_id}",
-      "starred_url": "https://api.github.com/users/acorncom/starred{/owner}{/repo}",
-      "subscriptions_url": "https://api.github.com/users/acorncom/subscriptions",
-      "organizations_url": "https://api.github.com/users/acorncom/orgs",
-      "repos_url": "https://api.github.com/users/acorncom/repos",
-      "events_url": "https://api.github.com/users/acorncom/events{/privacy}",
-      "received_events_url": "https://api.github.com/users/acorncom/received_events",
-      "type": "User",
       "site_admin": false
     },
-    "labels": [
-      {
-        "url": "https://api.github.com/repos/emberjs/ember.js/labels/Needs%20Help",
-        "name": "Needs Help",
-        "color": "84b6eb"
-      }
-    ],
+    "labels": [{
+      "url": "https://api.github.com/repos/emberjs-blr/github-webhook-test-repo/labels/bug",
+      "name": "bug",
+      "color": "ee0701"
+    }],
     "state": "open",
-    "title": "Testing issue",
     "locked": false,
     "assignee": null,
     "milestone": null,
     "comments": 0,
-    "created_at": "2016-04-23T20:27:21Z",
-    "updated_at": "2016-04-23T21:35:03Z",
+    "created_at": "2016-05-09T18:41:47Z",
+    "updated_at": "2016-05-09T18:41:47Z",
     "closed_at": null,
-    "body": "Setting this up"
+    "body": ""
   },
   "label": {
-    "url": "https://api.github.com/repos/acorncom/ember-hitlist-tester/labels/Help%20Wanted",
-    "name": "Help Wanted",
-    "color": "128A0C"
+    "url": "https://api.github.com/repos/emberjs-blr/github-webhook-test-repo/labels/bug",
+    "name": "bug",
+    "color": "ee0701"
   },
   "repository": {
-    "full_name": "emberjs/ember.js",
-    "html_url": "https://github.com/emberjs/ember.js",
+    "id": 58398124,
+    "name": "github-webhook-test-repo",
+    "full_name": "emberjs-blr/github-webhook-test-repo",
+    "owner": {
+      "login": "emberjs-blr",
+      "id": 10388269,
+      "avatar_url": "https://avatars.githubusercontent.com/u/10388269?v=3",
+      "gravatar_id": "",
+      "type": "Organization",
+      "site_admin": false
+    },
+    "private": false,
+    "description": "",
+    "fork": false,
   }
 };
 
 const baseIssue = {
-  id: 1,
-  url: "https://github.com/emberjs/ember.js/issues/1",
-  title: "Testing issue",
+  id: 153841776,
+  number: 1,
+  title: "test1",
   labels: [
     {
-      "url": "https://api.github.com/repos/emberjs/ember.js/labels/Needs%20Help",
-      "name": "Needs Help",
-      "color": "84b6eb"
+      "name": "bug",
+      "color": "ee0701"
     }
   ],
-  repo: "emberjs/ember.js",
-  repoUrl: "https://github.com/emberjs/ember.js",
+  repo: "github-webhook-test-repo",
+  org: "emberjs-blr",
+  state: "open",
+  createdAt: "2016-05-09T18:41:47Z",
+  updatedAt: "2016-05-09T18:41:47Z",
 };
 
 export default {
@@ -81,7 +81,6 @@ export default {
   payloadWithoutReqLabel: function(event) {
     let payload = cloneObject(basePayload);
     let unrecognizedLabel = {
-      "url": "https://api.github.com/repos/emberjs/ember.js/labels/i18n",
       "name": "i18n",
       "color": "84b6eb"
     };
@@ -96,22 +95,12 @@ export default {
   issueForPayloadWithoutReqLabel: (function() {
     let issue = cloneObject(baseIssue);
     issue.labels[0] = {
-      "url": "https://api.github.com/repos/emberjs/ember.js/labels/i18n",
       "name": "i18n",
       "color": "84b6eb"
     };
     return issue;
   })(),
 
-  issueForPayloadWithSplRepoName: baseIssue,
-
-  issueForPayloadWithNormalRepoName: (function() {
-    let issue = cloneObject(baseIssue);
-    issue.url = issue.url.replace('ember.js', 'api-docs');
-    issue.labels[0].url = issue.labels[0].url.replace('ember.js', 'api-docs');
-    issue.repoUrl = issue.repoUrl.replace('ember.js', 'api-docs');
-    issue.repo = issue.repo.replace('ember.js', 'api-docs');
-    return issue;
-  })(),
+  issueForPayloadWithNormalRepoName : baseIssue
 
 }

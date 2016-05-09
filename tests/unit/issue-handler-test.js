@@ -9,7 +9,14 @@ import Promise from 'bluebird'
 
 import IssueHandler from '../../src/lib/issue-handler';
 import fixtures from '../fixtures';
-import repos from '../../src/repos';
+
+const repos ={
+  'emberjs-blr/github-webhook-test-repo': {
+    labels: [
+      'bug',
+    ]
+  }
+};
 
 const {
   payloadWithReqLabel,

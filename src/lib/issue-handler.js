@@ -13,7 +13,6 @@ export default class IssueHandler {
     if (!this._hasOneOfDesiredLabels(event)) {
       return Promise.reject(`Doesn't have a label we're monitoring`);
     }
-
     const issueHash = this._constructIssueHash(event);
     return this._addIssueToDatastore(issueHash);
   }
@@ -67,15 +66,23 @@ export default class IssueHandler {
 
   _constructIssueHash({ payload }) {
 
+    let labels = payload.issue.labels.map(label => {
+      return {name: label.name, color: label.color}
+    });
+
     return {
-      id: payload.issue.number,
-      url: payload.issue.html_url,
+      id: payload.issue.id,
+      number: payload.issue.number,
       title: payload.issue.title,
-      labels: payload.issue.labels,
-      repo: payload.repository.full_name,
-      repoUrl: payload.repository.html_url
+      labels,
+      repo: payload.repository.name,
+      org: payload.repository.owner.login,
+      state: payload.issue.state,
+      createdAt: payload.issue.created_at,
+      updatedAt: payload.issue.updated_at,
     };
 
   }
 
 };
+
