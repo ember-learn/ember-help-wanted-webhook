@@ -1,5 +1,7 @@
 import bunyan from 'bunyan';
 
+const logDir = process.env.OPENSHIFT_LOG_DIR ? process.env.OPENSHIFT_LOG_DIR : './logs';
+
 export const logger = bunyan.createLogger({
   name: 'ember-help-wanted-service',
   level: process.env.LOGGER_LEVEL || 'debug',
@@ -8,7 +10,7 @@ export const logger = bunyan.createLogger({
     stream: process.stdout
   }, {
     level: 'info',
-    path: `${process.env.OPENSHIFT_LOG_DIR}events.log` || './logs/events.log',
+    path: `${logDir}/events.log`,
     type: 'rotating-file'
   }]
 });

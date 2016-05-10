@@ -13,8 +13,8 @@ import {logger} from './lib/logger';
 
 
 const handler = createHandler(configuration.webhook);
-const firebaseClient = new Firebase(configuration.firebaseHost);
-const dataStore = new DataStore(firebaseClient);
+const firebaseClient = new Firebase(configuration.firebase.host);
+const dataStore = new DataStore(firebaseClient, configuration.firebase.secret, configuration.firebase.writeUserId);
 const issueHandler = new IssueHandler(dataStore, repos);
 
 http.createServer(function (req, res) {

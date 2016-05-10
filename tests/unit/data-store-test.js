@@ -13,65 +13,94 @@ const {
 
 describe(`DataStore Tests`, function() {
 
+  const issueKey = 'issues/153841776/githubData';
   let callBackFn = function callBackFn() {
     return true;
   };
   let fakeClient;
+let dataStore;
+let expiresTime;
 
   beforeEach(function() {
     fakeClient = sinon.stub({
       child() {},
       set() {},
-      remove() {}
-    });
+      remove() {},
+      authWithCustomToken() {},
+     });
+    dataStore = new DataStore(fakeClient);
+    expiresTime = new Date();
+    expiresTime = expiresTime.setHours(expiresTime.getHours() +1);
+    dataStore._expiresTime = expiresTime;
   });
 
   afterEach(function() {
     fakeClient.child.restore();
     fakeClient.set.restore();
     fakeClient.remove.restore();
+    fakeClient.authWithCustomToken.restore();
   });
 
-const issueKey = 'issues/153841776/githubData';
-
-  describe(`Adding an issue works`, function() {
-
-    const testIssueAddition = (childRefPath, issue, done) => {
+  const testIssueAddition = (childRefPath, issue, done, checkForTokenRegeneration=false) => {
       fakeClient.child.withArgs(childRefPath).returns(fakeClient);
       fakeClient.set.withArgs(issue).returns(Promise.resolve());
 
-      let dataStore = new DataStore(fakeClient);
+      if (checkForTokenRegeneration) {
+        fakeClient.authWithCustomToken.returns(Promise.resolve({ auth: { expires: expiresTime } }));
+      }
+
       dataStore.addIssue(issue).then(function() {
         assert.ok(fakeClient.child.calledWith(childRefPath));
         assert.ok(fakeClient.set.calledWith(issue));
         assert.ok(true, 'Entry was added');
+        if (checkForTokenRegeneration) {
+          assert.ok(fakeClient.authWithCustomToken.called);
+        }
         done();
       });
     };
 
+  const testIssueRemoval = (childRefPath, issue, done, checkForTokenRegeneration=false) => {
+      fakeClient.child.withArgs(childRefPath).returns(fakeClient);
+      fakeClient.set.withArgs(issue).returns(Promise.resolve());
+
+      if (checkForTokenRegeneration) {
+        fakeClient.authWithCustomToken.returns(Promise.resolve({ auth: { expires: expiresTime } }));
+      }
+
+      dataStore.removeIssue(issue).then(function() {
+        assert.ok(fakeClient.child.calledWith(childRefPath));
+        assert.ok(fakeClient.set.calledWith(issue));
+        assert.ok(true, 'Entry was updated');
+        if (checkForTokenRegeneration) {
+          assert.ok(fakeClient.authWithCustomToken.called);
+        }
+        done();
+      });
+    };
+
+  describe(`Adding an issue works`, function() {
+
     it(`when the repo name is normal`, function(done) {
       testIssueAddition(issueKey, issueForPayloadWithNormalRepoName, done);
+    });
+
+    it(`even when token has expired`, function(done) {
+      dataStore._expiresTime = new Date();
+      testIssueAddition(issueKey, issueForPayloadWithNormalRepoName, done, true);
     });
 
   });
 
   describe(`Removing an issue works`, function() {
 
-    const testIssueRemoval = (childRefPath, issue, done) => {
-      fakeClient.child.withArgs(childRefPath).returns(fakeClient);
-      fakeClient.remove.returns(Promise.resolve());
-
-      let dataStore = new DataStore(fakeClient);
-      dataStore.removeIssue(issue).then(function() {
-        assert.ok(fakeClient.child.calledWith(childRefPath));
-        assert.ok(fakeClient.remove.called, 'Firebase remove api was called');
-        assert.ok(true, 'Entry was added');
-        done();
-      });
-    };
-
     it(`when the repo name is normal`, function(done) {
       testIssueRemoval(issueKey, issueForPayloadWithNormalRepoName, done);
+    });
+
+    it(`even when token has expired`, function(done) {
+      dataStore._expiresTime = new Date();
+      testIssueRemoval(issueKey, issueForPayloadWithNormalRepoName, done, true);
     });
 
   });
