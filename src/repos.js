@@ -1,6 +1,7 @@
+// NOTE: Ensure the labels are in lower case to make it easier for repo owners
 const standardLabels = [
-  'Bug',
-  'Help Wanted'
+  'bug',
+  'help wanted',
 ];
 
 let repoList = [

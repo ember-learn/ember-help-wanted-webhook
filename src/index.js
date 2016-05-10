@@ -70,5 +70,6 @@ handler.on('issues', function (event) {
   }, function(reason) {
     logger.error('Failed', reason, event.payload.issue.id);
   });
+
 });
 
