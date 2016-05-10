@@ -10,5 +10,16 @@ Used to populate our backend (currently Firebase) for the Ember Help Wanted app
 - To inspect payload visit http://127.0.0.1:4000
 - To inspect logs run ./node_modules/.bin/bunyan logs/events.log
 
+### Firebase setup
+- Set the security and rules to,
+```
+{
+    "rules": {
+        ".read": true,
+        ".write": "auth != null && auth.uid == 'YOUR_SECRET_TOKEN_HERE'"
+    }
+}
+```
+
 ### References
 https://github.com/rvagg/github-webhook-handler
