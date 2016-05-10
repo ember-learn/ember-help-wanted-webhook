@@ -53,9 +53,8 @@ export default class IssueHandler {
     const watchedRepo = this.watching[payload.repository.full_name];
 
     if( typeof watchedRepo !== 'undefined' ) {
-
       var result = payload.issue.labels.filter(function(label) {
-        return watchedRepo.labels.indexOf(label.name) !== -1;
+        return watchedRepo.labels.indexOf(label.name.toLowerCase()) !== -1;
       });
 
       return (result.length > 0);
