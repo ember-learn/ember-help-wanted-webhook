@@ -20,9 +20,12 @@ const repos ={
 
 const {
   payloadWithReqLabel,
+  payloadWithReqLabelButNoLabels,
   payloadWithoutReqLabel,
   issueForPayloadWithReqLabel,
-  issueForPayloadWithoutReqLabel
+  issueForPayloadWithReqLabelButNoLabels,
+  issueForClosedPayloadWithoutReqLabel,
+  issueForClosedPayloadWithReqLabel
 } = fixtures;
 
 describe(`Issue Handler Tests`, function() {
@@ -68,10 +71,19 @@ describe(`Issue Handler Tests`, function() {
   describe(`Unlabeling issues`, function() {
 
     it(`removes the issue from the store when it no longer has a valid label`, function(done) {
-      store.removeIssue.withArgs(issueForPayloadWithoutReqLabel).returns(Promise.resolve(true));
+      store.removeIssue.withArgs(issueForClosedPayloadWithoutReqLabel).returns(Promise.resolve(true));
       issueHandler.unlabel({ payload: payloadWithoutReqLabel('unlabeled')}).then(function() {
         assert.ok(true, 'Record is removed');
-        assert.ok(store.removeIssue.calledWith(issueForPayloadWithoutReqLabel));
+        assert.ok(store.removeIssue.calledWith(issueForClosedPayloadWithoutReqLabel));
+        done();
+      });
+    });
+
+    it(`removes the issue from the store when it no longer has any labels`, function(done) {
+      store.removeIssue.withArgs(issueForPayloadWithReqLabelButNoLabels).returns(Promise.resolve(true));
+      issueHandler.unlabel({ payload: payloadWithReqLabelButNoLabels('unlabeled')}).then(function() {
+        assert.ok(true, 'Record is removed');
+        assert.ok(store.removeIssue.calledWith(issueForPayloadWithReqLabelButNoLabels));
         done();
       });
     });
@@ -103,10 +115,10 @@ describe(`Issue Handler Tests`, function() {
   describe(`Closing issues`, function() {
 
     it(`removes the title on the client store`, function(done) {
-      store.removeIssue.withArgs(issueForPayloadWithReqLabel).returns(Promise.resolve(true));
+      store.removeIssue.withArgs(issueForClosedPayloadWithReqLabel).returns(Promise.resolve(true));
       issueHandler.close({payload: payloadWithReqLabel('closed')}).then(function() {
         assert.ok(true, 'Record was removed');
-        assert.ok(store.removeIssue.calledWith(issueForPayloadWithReqLabel));
+        assert.ok(store.removeIssue.calledWith(issueForClosedPayloadWithReqLabel));
         done();
       });
     });

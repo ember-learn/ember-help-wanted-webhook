@@ -78,6 +78,13 @@ export default {
     return payload;
   },
 
+  payloadWithReqLabelButNoLabels: function(event) {
+    let payload = cloneObject(basePayload);
+    payload.action = event;
+    payload.issue.labels = [];
+    return payload;
+  },
+
   payloadWithoutReqLabel: function(event) {
     let payload = cloneObject(basePayload);
     let unrecognizedLabel = {
@@ -92,12 +99,26 @@ export default {
 
   issueForPayloadWithReqLabel: baseIssue,
 
-  issueForPayloadWithoutReqLabel: (function() {
+  issueForClosedPayloadWithReqLabel: (function() {
+    let issue = cloneObject(baseIssue);
+    issue.state = 'closed';
+    return issue;
+  })(),
+
+  issueForPayloadWithReqLabelButNoLabels: (function() {
+    let issue = cloneObject(baseIssue);
+    issue.labels = [];
+    issue.state = 'closed';
+    return issue;
+  })(),
+
+  issueForClosedPayloadWithoutReqLabel: (function() {
     let issue = cloneObject(baseIssue);
     issue.labels[0] = {
       "name": "i18n",
       "color": "84b6eb"
     };
+    issue.state = 'closed';
     return issue;
   })(),
 

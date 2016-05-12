@@ -45,7 +45,7 @@ export default class IssueHandler {
   }
 
   _removeIssueFromDatastore(internalIssueHash) {
-    // clean things up on Firebase
+    internalIssueHash.state = 'closed'; // ensure that this issue actually closes
     return this.dataStoreClient.removeIssue(internalIssueHash);
   }
 
