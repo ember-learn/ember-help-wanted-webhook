@@ -9,7 +9,7 @@ import configuration from './config';
 import IssueHandler from './lib/issue-handler';
 import DataStore from './lib/data-store';
 import repos from './repos';
-import {logger} from './lib/logger';
+import logger from './lib/logger';
 
 
 const handler = createHandler(configuration.webhook);

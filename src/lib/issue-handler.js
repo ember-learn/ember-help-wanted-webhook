@@ -1,6 +1,6 @@
 /* jshint node: true */
 import Promise from 'bluebird';
-
+import logger from './logger';
 
 export default class IssueHandler {
 
@@ -37,6 +37,26 @@ export default class IssueHandler {
 
   reopen(event) {
     return this.label(event);
+  }
+
+  bulkAdd(repoFullName, issues) {
+    const checkIfIssueIsToBeConsidered = (issue) => {
+      const payload = {
+        issue,
+        repository: {
+          full_name: repoFullName
+        }
+      };
+      return this._hasOneOfDesiredLabels({payload});
+    };
+    const issuesToAdd = issues
+      .filter(checkIfIssueIsToBeConsidered)
+      .map(issue => this._constructIssueHash({ payload: { issue } }));
+    if (issuesToAdd.length === 0) {
+      logger.debug(`No issues have the labels we monitor`);
+      return Promise.resolve();
+    }
+    return this.dataStoreClient.bulkAdd(issuesToAdd);
   }
 
   _addIssueToDatastore(internalIssueHash) {

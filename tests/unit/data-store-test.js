@@ -8,7 +8,8 @@ import Fixtures from '../fixtures';
 import DataStore from '../../src/lib/data-store';
 
 const {
-  issueForPayloadWithNormalRepoName
+  issueForPayloadWithNormalRepoName,
+  bulkIssuesStoreObj,
 } = Fixtures;
 
 describe(`DataStore Tests`, function() {
@@ -103,6 +104,23 @@ let expiresTime;
       testIssueRemoval(issueKey, issueForPayloadWithNormalRepoName, done, true);
     });
 
+  });
+
+  describe(`Bulk add works`, function() {
+    it(`saves them in bulk`, function(done) {
+      const issuePath = '/issues/143282771/githubData';
+      fakeClient.authWithCustomToken.returns(Promise.resolve());
+      fakeClient.child.withArgs(issuePath).returns(fakeClient);
+      fakeClient.set.withArgs(bulkIssuesStoreObj[0]).returns(Promise.resolve());
+      dataStore.bulkAdd(bulkIssuesStoreObj).then(function() {
+        console.log(fakeClient.authWithCustomToken.args);
+        assert.ok(fakeClient.authWithCustomToken.called);
+        assert.ok(fakeClient.child.calledWith(issuePath));
+        ssert.ok(fakeClient.set.calledWith(bulkIssuesStoreObj[0]));
+        done();
+      });
+
+    });
   });
 
 });

@@ -2,6 +2,7 @@
 const standardLabels = [
   'bug',
   'help wanted',
+  'good for new contributors',
 ];
 
 let repoList = [

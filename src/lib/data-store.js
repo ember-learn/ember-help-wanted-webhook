@@ -1,4 +1,4 @@
-import {logger} from './logger';
+import logger from './logger';
 import FirebaseTokenGenerator from 'firebase-token-generator';
 import Promise from 'bluebird';
 
@@ -16,6 +16,18 @@ export default class DataStore {
     this._expiresTime = new Date();
     this._firebaseSecret = firebaseSecret;
     this._writeUserId = writeUserId;
+  }
+
+  bulkAdd(issues) {
+    logger.debug(`No of issues to be added in bulk: ${issues.length}`);
+    let promises = [];
+    this._regenerateAuthIfNecessary().then(() => {
+      Promise.mapSeries(issues, (issue) => {
+        const issueRef = this._getStoreReference(issue);
+        promises.push(this.client.set(issue));
+      });
+    });
+    return Promise.all(promises);
   }
 
   addIssue(issue) {
@@ -36,6 +48,7 @@ export default class DataStore {
 
   _regenerateAuthIfNecessary() {
     if (this._expiresTime > new Date()) {
+      logger.debug('Token regeneration not required');
       return Promise.resolve();
     }
 
@@ -44,7 +57,10 @@ export default class DataStore {
       { uid: this._writeUserId }
     );
 
+    logger.debug('Generating a new token');
+
     return this._client.authWithCustomToken(token).then((authData) => {
+      logger.info('Token regenerated');
       this._expiresTime = authData.expires;
       return Promise.resolve();
     }, function(error) {
