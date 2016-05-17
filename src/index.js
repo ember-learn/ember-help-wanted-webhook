@@ -3,6 +3,7 @@ import util from 'util';
 import http from 'http';
 import createHandler from 'github-webhook-handler';
 import nano from 'nano';
+import Promise from 'bluebird';
 
 import config from './config';
 import IssueHandler from './lib/issue-handler';
@@ -14,8 +15,9 @@ import logger from './lib/logger';
 const handler = createHandler(config.webhook);
 
 const couchIssuesDB = nano(`${config.couch.host}:${config.couch.port}/${config.couch.dbName}`);
+Promise.promisifyAll(couchIssuesDB);
 const dataStore = new DataStore(couchIssuesDB);
-const issueHandler = new IssueHandler(dataStore, repos);
+const issueHandler = new IssueHandler(dataStore);
 
 http.createServer(function (req, res) {
   handler(req, res, function (err) {
@@ -34,7 +36,12 @@ handler.on('ping', function (event) {
 });
 
 handler.on('issues', function (event) {
-  const supportedActions = ['edited', 'labeled', 'unlabeled', 'closed', 'reopened'];
+  if (!repos[event.payload.repository.full_name.trim()]) {
+    logger.debug(`Repo ${event.payload.repository.full_name} is not configured`);
+    logger.trace(event);
+    return;
+  }
+  const supportedActions = ['edited', 'labeled', 'unlabeled', 'closed', 'reopened', 'opened'];
   const action = event.payload.action;
 
   if (supportedActions.indexOf(action) === -1) {
@@ -42,10 +49,13 @@ handler.on('issues', function (event) {
     return;
   }
 
-  logger.info(event);
+  logger.trace(event);
 
   let op;
-  switch( event.payload.action ) {
+  switch (event.payload.action) {
+    case 'opened':
+      op = issueHandler.add(event);
+      break;
     case 'edited':
       op = issueHandler.edit(event);
       break;
@@ -66,9 +76,9 @@ handler.on('issues', function (event) {
   }
 
   op.then(function() {
-    logger.info('Success', event.payload.issue.id);
+    logger.info(`Success in performing ${event.payload.action}`, event.payload.issue.id);
   }, function(reason) {
-    logger.error('Failed', reason, event.payload.issue.id);
+    logger.error(`Failed performing ${event.payload.action}`, reason, event.payload.issue.id);
   });
 
 });

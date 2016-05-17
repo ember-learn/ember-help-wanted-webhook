@@ -6,7 +6,7 @@ const standardLabels = [
 ];
 
 let repoList = [
-  'acorncom/ember-hitlist-tester',
+  'sivakumar-kailasam/github-webhook-test-repo',
   'ember-learn/ember-help-wanted',
   'ember-learn/ember-help-wanted-webhook',
   'emberjs/guides',

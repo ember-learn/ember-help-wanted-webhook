@@ -112,12 +112,12 @@ describe(`DataStore Tests`, function() {
     let issueToDelete = issue;
     issueToDelete._deleted = true;
     if (doesIssueExist) {
-      fakeClient.destroyAsync.withArgs(issue).returns(Promise.resolve(issue));
+      fakeClient.destroyAsync.withArgs(issue._id, issue._rev).returns(Promise.resolve(issue));
     }
 
     dataStore.removeIssue(issue).then(function() {
       assert.ok(fakeClient.getAsync.calledWith(issue._id));
-      assert.ok(fakeClient.destroyAsync.calledWith(issueToDelete));
+      assert.ok(fakeClient.destroyAsync.calledWith(issueToDelete._id, issueToDelete._rev));
       done();
     }, function(err) {
       if (!doesIssueExist) {

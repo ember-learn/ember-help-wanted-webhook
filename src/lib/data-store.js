@@ -19,25 +19,28 @@ export default class DataStore {
   }
 
   addIssue(issue) {
+    logger.debug(`adding {issue._id} in store`);
     return this._client.insertAsync(issue);
   }
 
   updateIssue(issue) {
     return this._getStoreReference(issue).then((issueFromStore) => {
+      logger.debug(`updating ${issue._id} in store`);
       let updatedIssue = issue;
       updatedIssue._rev = issueFromStore._rev;
       return this._client.insertAsync(updatedIssue);
     }, () => {
+      logger.debug(`adding {issue._id} in store`);
       return this._client.insertAsync(issue);
     });
   }
 
   removeIssue(issue) {
     return this._getStoreReference(issue).then(issueFromStore => {
+      logger.debug(`deleting ${issue._id} from store`);
       let issueToDelete = issue;
       issueToDelete._rev = issueFromStore._rev;
-      issueToDelete._deleted = true;
-      return this._client.destroyAsync(issueToDelete);
+      return this._client.destroyAsync(issueToDelete._id, issueFromStore._rev);
     }, (err) => {
       return Promise.reject(`Issue doesnt exist ${err}`);
     });

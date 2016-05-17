@@ -26,11 +26,11 @@ if (!repos[repoInfo]) {
 
 const [ orgName, repoName ] = repoInfo.split('/');
 const github = new GitHubApi({
-  version: "3.0.0",
-  protocol: "https",
+  version: '3.0.0',
+  protocol: 'https',
   debug: true,
   headers: {
-    "user-agent": "Ember help wanted indexer"
+    'user-agent': 'Ember help wanted indexer'
   }
 });
 

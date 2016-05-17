@@ -4,9 +4,8 @@ import logger from './logger';
 
 export default class IssueHandler {
 
-  constructor(dataStoreClient, repos) {
+  constructor(dataStoreClient) {
     this.dataStoreClient = dataStoreClient;
-    this.watching =  repos;
   }
 
   label(event) {
@@ -27,6 +26,11 @@ export default class IssueHandler {
   close(event) {
     const issueHash = this._constructIssueHash(event);
     return this.dataStoreClient.removeIssue(issueHash);
+  }
+
+  add(event) {
+    const issueHash = this._constructIssueHash(event);
+    return this.dataStoreClient.addIssue(issueHash);
   }
 
   reopen(event) {
@@ -61,7 +65,7 @@ export default class IssueHandler {
 
     if (payload.issue.labels) {
       labels =  payload.issue.labels.map(label => {
-        return {name: label.name, color: label.color}
+        return { name: label.name, color: label.color };
       });
     }
 

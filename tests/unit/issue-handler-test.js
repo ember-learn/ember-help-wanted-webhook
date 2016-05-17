@@ -106,8 +106,19 @@ describe(`Issue Handler Tests`, function() {
   });
 
 
+  describe(`Creating issues`, function() {
+    it(`saves to the store`, function(done) {
+      store.addIssue.withArgs(issueWithReqLabels).returns(Promise.resolve(true));
+      issueHandler.add({ payload: payloadWithReqLabels }).then(function() {
+        assert.ok(true, 'Record is saved');
+        assert.ok(store.addIssue.calledWith(issueWithReqLabels));
+        done();
+      });
+    });
+  });
+
   describe(`Reopening issues`, function() {
-    it(`saves to the store when there's a valid label`, function(done) {
+    it(`saves to the store`, function(done) {
       store.addIssue.withArgs(issueWithReqLabels).returns(Promise.resolve(true));
       issueHandler.reopen({ payload: payloadWithReqLabels }).then(function() {
         assert.ok(true, 'Record is saved');
