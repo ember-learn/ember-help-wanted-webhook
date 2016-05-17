@@ -6,13 +6,13 @@ const standardLabels = [
 ];
 
 let repoList = [
-  'sivakumar-kailasam/github-webhook-test-repo',
   'ember-learn/ember-help-wanted',
   'ember-learn/ember-help-wanted-webhook',
   'emberjs/guides',
   'emberjs/website',
   'emberjs/ember.js',
   'ember-cli/ember-cli',
+  'ember-cli/ember-cli.github.io',
 ];
 
 let repoHash = {};
