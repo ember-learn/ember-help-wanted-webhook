@@ -54,7 +54,7 @@ const basePayload = {
 };
 
 const baseIssue = {
-  _id: 153841776,
+  _id: "153841776",
   number: 1,
   title: "test1",
   labels: [

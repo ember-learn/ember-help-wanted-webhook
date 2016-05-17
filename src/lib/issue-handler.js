@@ -66,7 +66,7 @@ export default class IssueHandler {
     }
 
     return {
-      _id: payload.issue.id,
+      _id: payload.issue.id.toString(),
       number: payload.issue.number,
       title: payload.issue.title,
       labels,

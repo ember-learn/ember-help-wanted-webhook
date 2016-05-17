@@ -39,10 +39,10 @@ describe(`DataStore Tests`, function() {
   });
 
   const testIssueBulkAddition = (issues, done) => {
-    fakeClient.bulkAsync.withArgs(issues).returns(Promise.resolve(issues));
+    fakeClient.bulkAsync.withArgs({ docs: issues }).returns(Promise.resolve(issues));
 
     dataStore.bulkAdd(issues).then(function() {
-      assert.ok(fakeClient.bulkAsync.calledWith(issues));
+      assert.ok(fakeClient.bulkAsync.calledWith({ docs: issues }));
       assert.ok(true, 'Entries was added');
       done();
     });

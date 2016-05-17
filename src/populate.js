@@ -1,15 +1,15 @@
-#!/usr/bin/env iron-node
+#!/usr/bin/env node
 
 import GitHubApi from 'github';
 import Promise from 'bluebird';
 import linkHeaderParser from 'parse-link-header';
-import Firebase from "firebase";
+import nano from 'nano';
 
 import IssueHandler from './lib/issue-handler';
 import DataStore from './lib/data-store';
 import logger from './lib/logger';
 import repos from './repos';
-import configuration from './config';
+import config from './config';
 
 
 const repoInfo = process.argv[2];
@@ -63,8 +63,9 @@ const populateIssues = (pageNo=1) => {
 };
 
 populateIssues().then(function(issueResults) {
-  const firebaseClient = new Firebase(configuration.firebase.host);
-  const dataStore = new DataStore(firebaseClient, configuration.firebase.secret, configuration.firebase.writeUserId);
+  const couchIssuesDB = nano(`${config.couch.host}:${config.couch.port}/${config.couch.dbName}`);
+  Promise.promisifyAll(couchIssuesDB);
+  const dataStore = new DataStore(couchIssuesDB);
   const issueHandler = new IssueHandler(dataStore, repos);
 
   const issues = issueResults.filter(issue => !issue['pull_request']);

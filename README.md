@@ -1,5 +1,5 @@
 # ember-help-wanted-webhook
-Used to populate our backend (currently Firebase) for the Ember Help Wanted app
+Used to populate our backend (currently CouchDB) for the Ember Help Wanted app
 
 
 ### Development

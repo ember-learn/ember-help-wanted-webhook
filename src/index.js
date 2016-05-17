@@ -1,20 +1,20 @@
 #!/usr/bin/env node
-// @TODO: remove when not needed
 import util from 'util';
 import http from 'http';
 import createHandler from 'github-webhook-handler';
-import Firebase from "firebase";
+import nano from 'nano';
 
-import configuration from './config';
+import config from './config';
 import IssueHandler from './lib/issue-handler';
 import DataStore from './lib/data-store';
 import repos from './repos';
 import logger from './lib/logger';
 
 
-const handler = createHandler(configuration.webhook);
-const firebaseClient = new Firebase(configuration.firebase.host);
-const dataStore = new DataStore(firebaseClient, configuration.firebase.secret, configuration.firebase.writeUserId);
+const handler = createHandler(config.webhook);
+
+const couchIssuesDB = nano(`${config.couch.host}:${config.couch.port}/${config.couch.dbName}`);
+const dataStore = new DataStore(couchIssuesDB);
 const issueHandler = new IssueHandler(dataStore, repos);
 
 http.createServer(function (req, res) {
@@ -22,7 +22,7 @@ http.createServer(function (req, res) {
     res.statusCode = 404;
     res.end('no such location');
   });
-}).listen(configuration.port, configuration.ip);
+}).listen(config.port, config.ip);
 
 handler.on('error', (err) =>  logger.error('Error:', err.message) );
 

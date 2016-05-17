@@ -15,7 +15,7 @@ export default class DataStore {
   }
 
   bulkAdd(issues) {
-    return this._client.bulkAsync(issues);
+    return this._client.bulkAsync({docs: issues});
   }
 
   addIssue(issue) {
