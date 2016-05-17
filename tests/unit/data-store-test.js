@@ -1,5 +1,3 @@
-/* jshint node: true */
-/* jshint mocha: true */
 import assert from 'assert';
 import sinon from 'sinon';
 import Promise from 'bluebird';
@@ -8,119 +6,137 @@ import Fixtures from '../fixtures';
 import DataStore from '../../src/lib/data-store';
 
 const {
-  issueForPayloadWithNormalRepoName,
-  bulkIssuesStoreObj,
+  issueWithReqLabels
 } = Fixtures;
 
 describe(`DataStore Tests`, function() {
 
-  const issueKey = 'issues/153841776/githubData';
+  let baseIssue;
+
   let callBackFn = function callBackFn() {
     return true;
   };
   let fakeClient;
-let dataStore;
-let expiresTime;
+  let dataStore;
+  let expiresTime;
 
   beforeEach(function() {
     fakeClient = sinon.stub({
-      child() {},
-      set() {},
-      remove() {},
-      authWithCustomToken() {},
-     });
+      bulkAsync() {},
+      destroyAsync() {},
+      getAsync() {},
+      insertAsync() {},
+    });
     dataStore = new DataStore(fakeClient);
-    expiresTime = new Date();
-    expiresTime = expiresTime.setHours(expiresTime.getHours() +1);
-    dataStore._expiresTime = expiresTime;
+    baseIssue = JSON.parse(JSON.stringify(issueWithReqLabels));
   });
 
   afterEach(function() {
-    fakeClient.child.restore();
-    fakeClient.set.restore();
-    fakeClient.remove.restore();
-    fakeClient.authWithCustomToken.restore();
+    fakeClient.bulkAsync.restore();
+    fakeClient.destroyAsync.restore();
+    fakeClient.getAsync.restore();
+    fakeClient.insertAsync.restore();
   });
 
-  const testIssueAddition = (childRefPath, issue, done, checkForTokenRegeneration=false) => {
-      fakeClient.child.withArgs(childRefPath).returns(fakeClient);
-      fakeClient.set.withArgs(issue).returns(Promise.resolve());
+  const testIssueBulkAddition = (issues, done) => {
+    fakeClient.bulkAsync.withArgs(issues).returns(Promise.resolve(issues));
 
-      if (checkForTokenRegeneration) {
-        fakeClient.authWithCustomToken.returns(Promise.resolve({ auth: { expires: expiresTime } }));
-      }
+    dataStore.bulkAdd(issues).then(function() {
+      assert.ok(fakeClient.bulkAsync.calledWith(issues));
+      assert.ok(true, 'Entries was added');
+      done();
+    });
+  };
 
-      dataStore.addIssue(issue).then(function() {
-        assert.ok(fakeClient.child.calledWith(childRefPath));
-        assert.ok(fakeClient.set.calledWith(issue));
-        assert.ok(true, 'Entry was added');
-        if (checkForTokenRegeneration) {
-          assert.ok(fakeClient.authWithCustomToken.called);
-        }
-        done();
-      });
-    };
+  describe(`Bulk adding an issue works`, function() {
 
-  const testIssueRemoval = (childRefPath, issue, done, checkForTokenRegeneration=false) => {
-      fakeClient.child.withArgs(childRefPath).returns(fakeClient);
-      fakeClient.set.withArgs(issue).returns(Promise.resolve());
+    it(`when the repo name is normal`, function(done) {
+      testIssueBulkAddition([baseIssue], done);
+    });
 
-      if (checkForTokenRegeneration) {
-        fakeClient.authWithCustomToken.returns(Promise.resolve({ auth: { expires: expiresTime } }));
-      }
+  });
 
-      dataStore.removeIssue(issue).then(function() {
-        assert.ok(fakeClient.child.calledWith(childRefPath));
-        assert.ok(fakeClient.set.calledWith(issue));
-        assert.ok(true, 'Entry was updated');
-        if (checkForTokenRegeneration) {
-          assert.ok(fakeClient.authWithCustomToken.called);
-        }
-        done();
-      });
-    };
+  const testIssueAddition = (issue, done) => {
+    fakeClient.insertAsync.withArgs(issue).returns(Promise.resolve(issue));
+
+    dataStore.addIssue(issue).then(function() {
+      assert.ok(fakeClient.insertAsync.calledWith(issue));
+      assert.ok(true, 'Entry was added');
+      done();
+    });
+  };
 
   describe(`Adding an issue works`, function() {
 
     it(`when the repo name is normal`, function(done) {
-      testIssueAddition(issueKey, issueForPayloadWithNormalRepoName, done);
-    });
-
-    it(`even when token has expired`, function(done) {
-      dataStore._expiresTime = new Date();
-      testIssueAddition(issueKey, issueForPayloadWithNormalRepoName, done, true);
+      testIssueAddition(baseIssue, done);
     });
 
   });
 
-  describe(`Removing an issue works`, function() {
+  const testIssueUpdate = (issue, done, doesIssueExist=true) => {
+    let updatedIssue = issue;
+    if (doesIssueExist) {
+      updatedIssue._rev = 'something';
+    }
 
-    it(`when the repo name is normal`, function(done) {
-      testIssueRemoval(issueKey, issueForPayloadWithNormalRepoName, done);
+    fakeClient.getAsync.withArgs(issue._id).returns(doesIssueExist ? Promise.resolve(updatedIssue): Promise.reject({}));
+    fakeClient.insertAsync.withArgs(updatedIssue).returns(Promise.resolve(updatedIssue));
+
+    dataStore.updateIssue(issue).then(function() {
+      assert.ok(fakeClient.insertAsync.calledWith(updatedIssue));
+      assert.ok(fakeClient.getAsync.calledWith(issue._id));
+      done();
+    });
+  };
+
+  describe(`Updating an issue`, function() {
+
+    it(`when issue exists`, function(done) {
+      testIssueUpdate(baseIssue, done);
     });
 
-    it(`even when token has expired`, function(done) {
-      dataStore._expiresTime = new Date();
-      testIssueRemoval(issueKey, issueForPayloadWithNormalRepoName, done, true);
+
+    it(`when issue doesn't exist`, function(done) {
+      testIssueUpdate(baseIssue, done, false);
     });
 
   });
 
-  describe(`Bulk add works`, function() {
-    it(`saves them in bulk`, function(done) {
-      const issuePath = '/issues/143282771/githubData';
-      fakeClient.authWithCustomToken.returns(Promise.resolve());
-      fakeClient.child.withArgs(issuePath).returns(fakeClient);
-      fakeClient.set.withArgs(bulkIssuesStoreObj[0]).returns(Promise.resolve());
-      dataStore.bulkAdd(bulkIssuesStoreObj).then(function() {
-        console.log(fakeClient.authWithCustomToken.args);
-        assert.ok(fakeClient.authWithCustomToken.called);
-        assert.ok(fakeClient.child.calledWith(issuePath));
-        ssert.ok(fakeClient.set.calledWith(bulkIssuesStoreObj[0]));
+  const testIssueRemoval = (issue, done, doesIssueExist=true) => {
+    let issueFromStore = issue;
+    issueFromStore._rev = 'something';
+    const valToReturn = doesIssueExist ? Promise.resolve(issueFromStore) : Promise.reject({error: 'error'});
+    fakeClient.getAsync.withArgs(issue._id).returns(valToReturn);
+
+    let issueToDelete = issue;
+    issueToDelete._deleted = true;
+    if (doesIssueExist) {
+      fakeClient.destroyAsync.withArgs(issue).returns(Promise.resolve(issue));
+    }
+
+    dataStore.removeIssue(issue).then(function() {
+      assert.ok(fakeClient.getAsync.calledWith(issue._id));
+      assert.ok(fakeClient.destroyAsync.calledWith(issueToDelete));
+      done();
+    }, function(err) {
+      if (!doesIssueExist) {
         done();
-      });
+      }
+    })
+  };
 
+  describe(`Deleting an issue`, function() {
+
+    it(`when issue exists`, function(done) {
+      testIssueRemoval(baseIssue, done);
     });
+
+
+    it(`when issue doesn't exist`, function(done) {
+      testIssueRemoval(baseIssue, done, false);
+    });
+
   });
 
 });
