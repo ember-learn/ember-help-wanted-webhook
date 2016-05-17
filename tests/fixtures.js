@@ -106,64 +106,6 @@ export default {
     let payload = cloneObject(basePayload);
     payload.issue.labels = [];
     return payload;
-  }()),
-  //payloadWithReqLabel: function(event) {
-    //let payload = cloneObject(basePayload);
-    //payload.action = event;
-    //return payload;
-  //},
-
-  //payloadWithReqLabelButNoLabels: function(event) {
-    //let payload = cloneObject(basePayload);
-    //payload.action = event;
-    //payload.issue.labels = [];
-    //return payload;
-  //},
-
-  //payloadWithoutReqLabel: function(event) {
-    //let payload = cloneObject(basePayload);
-    //let unrecognizedLabel = {
-      //"name": "i18n",
-      //"color": "84b6eb"
-    //};
-    //payload.issue.labels[0] = unrecognizedLabel;
-    //payload.label = unrecognizedLabel;
-    //payload.action = event;
-    //return payload;
-  //},
-
-  //issueWithoutReqLabel: (function() {
-    //let issue = cloneObject(baseIssue);
-    //issue.labels[0] = {
-      //"name": "i18n",
-      //"color": "84b6eb"
-    //};
-    //return issue;
-  //})(),
-
-  //issueForClosedPayloadWithReqLabel: (function() {
-    //let issue = cloneObject(baseIssue);
-    //issue.state = 'closed';
-    //return issue;
-  //})(),
-
-  //issueForPayloadWithReqLabelButNoLabels: (function() {
-    //let issue = cloneObject(baseIssue);
-    //issue.labels = [];
-    //issue.state = 'closed';
-    //return issue;
-  //})(),
-
-  //issueForClosedPayloadWithoutReqLabel: (function() {
-    //let issue = cloneObject(baseIssue);
-    //issue.labels[0] = {
-      //"name": "i18n",
-      //"color": "84b6eb"
-    //};
-    //issue.state = 'closed';
-    //return issue;
-  //})(),
-
-  //baseIssue
+  }())
 
 }
