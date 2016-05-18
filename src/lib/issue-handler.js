@@ -69,16 +69,21 @@ export default class IssueHandler {
       });
     }
 
+    let id = "issue_" + payload.issue.id.toString();
+
     return {
-      _id: payload.issue.id.toString(),
-      number: payload.issue.number,
-      title: payload.issue.title,
-      labels,
-      repo: payload.repository.name,
-      org: payload.repository.owner.login,
-      state: payload.issue.state,
-      createdAt: payload.issue.created_at,
-      updatedAt: payload.issue.updated_at,
+      _id: id,
+      data: {
+        _id: id,
+        number: payload.issue.number,
+        title: payload.issue.title,
+        labels,
+        repo: payload.repository.name,
+        org: payload.repository.owner.login,
+        state: payload.issue.state,
+        createdAt: payload.issue.created_at,
+        updatedAt: payload.issue.updated_at,
+      }
     };
 
   }
