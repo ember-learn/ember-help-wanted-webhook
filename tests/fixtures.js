@@ -54,20 +54,23 @@ const basePayload = {
 };
 
 const baseIssue = {
-  _id: "153841776",
-  number: 1,
-  title: "test1",
-  labels: [
-    {
-      "name": "bug",
-      "color": "ee0701"
-    }
-  ],
-  repo: "github-webhook-test-repo",
-  org: "emberjs-blr",
-  state: "open",
-  createdAt: "2016-05-09T18:41:47Z",
-  updatedAt: "2016-05-09T18:41:47Z",
+  _id: "issue_153841776",
+  data: {
+    _id: "issue_153841776",
+    number: 1,
+    title: "test1",
+    labels: [
+      {
+        "name": "bug",
+        "color": "ee0701"
+      }
+    ],
+    repo: "github-webhook-test-repo",
+    org: "emberjs-blr",
+    state: "open",
+    createdAt: "2016-05-09T18:41:47Z",
+    updatedAt: "2016-05-09T18:41:47Z"
+  }
 };
 
 export default {
@@ -78,7 +81,7 @@ export default {
 
   issueWithoutReqLabels: (function() {
     let issue = cloneObject(baseIssue);
-    issue.labels[0] = {
+    issue.data.labels[0] = {
       name: 'i18n',
       color: '84b6eb'
     };
@@ -98,7 +101,7 @@ export default {
 
   issueWithNoLabels: (function() {
     let issue = cloneObject(baseIssue);
-    issue.labels = [];
+    issue.data.labels = [];
     return issue;
   }()),
 
