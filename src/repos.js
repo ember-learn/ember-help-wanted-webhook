@@ -2,6 +2,7 @@
 const standardLabels = [
   'bug',
   'help wanted',
+  'good for new contributors',
 ];
 
 let repoList = [
@@ -11,6 +12,7 @@ let repoList = [
   'emberjs/website',
   'emberjs/ember.js',
   'ember-cli/ember-cli',
+  'ember-cli/ember-cli.github.io',
 ];
 
 let repoHash = {};

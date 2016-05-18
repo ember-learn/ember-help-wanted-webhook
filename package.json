@@ -8,10 +8,10 @@
   },
   "scripts": {
     "build": "rm -rf build/*; babel src -d build",
-    "dev": "npm run build && node build/index.js",
-    "start": "node build/index.js",
+    "start": "npm run build && node build/index.js",
     "test": "mocha $npm_package_config_MOCHA_OPTS tests/unit/*.js",
-    "test:watch": "mocha $npm_package_config_MOCHA_OPTS -w tests/unit/*.js"
+    "test:watch": "mocha $npm_package_config_MOCHA_OPTS -w tests/unit/*.js",
+    "populate:dev": "npm run build && ./build/populate.js ember-cli/ember-cli | bunyan"
   },
   "repository": {
     "type": "git",
@@ -29,11 +29,12 @@
     "babel-register": "6.8.0",
     "bluebird": "3.3.5",
     "bunyan": "1.8.1",
-    "firebase": "^2.4.2",
-    "firebase-token-generator": "2.0.0",
+    "github": "0.2.4",
     "github-webhook-handler": "^0.5.0",
     "mocha": "^2.4.5",
     "mocha-only-detector": "^0.1.0",
+    "nano": "6.2.0",
+    "parse-link-header": "0.4.1",
     "sinon": "^1.17.3"
   }
 }

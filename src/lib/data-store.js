@@ -1,5 +1,4 @@
-import {logger} from './logger';
-import FirebaseTokenGenerator from 'firebase-token-generator';
+import logger from './logger';
 import Promise from 'bluebird';
 
 const errPromise = function(err) {
@@ -11,55 +10,44 @@ const errPromise = function(err) {
  */
 export default class DataStore {
 
-  constructor(client, firebaseSecret='', writeUserId='') {
+  constructor(client) {
     this._client = client;
-    this._expiresTime = new Date();
-    this._firebaseSecret = firebaseSecret;
-    this._writeUserId = writeUserId;
+  }
+
+  bulkAdd(issues) {
+    return this._client.bulkAsync({docs: issues});
   }
 
   addIssue(issue) {
-    return this._regenerateAuthIfNecessary().then(() => {
-      logger.debug('Adding issue', issue);
-      const issueRef = this._getStoreReference(issue);
-      return issueRef.set(issue);
-    }, errPromise);
+    logger.debug(`adding {issue._id} in store`);
+    return this._client.insertAsync(issue);
+  }
+
+  updateIssue(issue) {
+    return this._getStoreReference(issue).then((issueFromStore) => {
+      logger.debug(`updating ${issue._id} in store`);
+      let updatedIssue = issue;
+      updatedIssue._rev = issueFromStore._rev;
+      return this._client.insertAsync(updatedIssue);
+    }, () => {
+      logger.debug(`adding {issue._id} in store`);
+      return this._client.insertAsync(issue);
+    });
   }
 
   removeIssue(issue) {
-    return this._regenerateAuthIfNecessary().then(() => {
-      logger.debug('Remove issue', issue);
-      const issueRef = this._getStoreReference(issue);
-      return issueRef.set(issue);
-    }, errPromise);
-  }
-
-  _regenerateAuthIfNecessary() {
-    if (this._expiresTime > new Date()) {
-      return Promise.resolve();
-    }
-
-    const tokenGenerator = new FirebaseTokenGenerator(this._firebaseSecret);
-    const token = tokenGenerator.createToken(
-      { uid: this._writeUserId }
-    );
-
-    return this._client.authWithCustomToken(token).then((authData) => {
-      this._expiresTime = authData.expires;
-      return Promise.resolve();
-    }, function(error) {
-      logger.error("Login Failed!", error);
-      return Promise.reject(error);
+    return this._getStoreReference(issue).then(issueFromStore => {
+      logger.debug(`deleting ${issue._id} from store`);
+      let issueToDelete = issue;
+      issueToDelete._rev = issueFromStore._rev;
+      return this._client.destroyAsync(issueToDelete._id, issueFromStore._rev);
+    }, (err) => {
+      return Promise.reject(`Issue doesnt exist ${err}`);
     });
   }
 
   _getStoreReference(issue) {
-    let {
-      id:issueId
-    } = issue;
-
-    const path = `issues/${issueId}/githubData`;
-    return this._client.child(path);
+    return this._client.getAsync(issue._id);
   }
 
 };

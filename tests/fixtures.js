@@ -54,7 +54,7 @@ const basePayload = {
 };
 
 const baseIssue = {
-  id: 153841776,
+  _id: "153841776",
   number: 1,
   title: "test1",
   labels: [
@@ -72,35 +72,40 @@ const baseIssue = {
 
 export default {
 
-  payloadWithReqLabel: function(event) {
-    let payload = cloneObject(basePayload);
-    payload.action = event;
-    return payload;
-  },
+  issueWithReqLabels: baseIssue,
 
-  payloadWithoutReqLabel: function(event) {
+  payloadWithReqLabels: basePayload,
+
+  issueWithoutReqLabels: (function() {
+    let issue = cloneObject(baseIssue);
+    issue.labels[0] = {
+      name: 'i18n',
+      color: '84b6eb'
+    };
+    return issue;
+  }()),
+
+  payloadWithoutReqLabels: (function() {
     let payload = cloneObject(basePayload);
     let unrecognizedLabel = {
-      "name": "i18n",
-      "color": "84b6eb"
+      name: "i18n",
+      color: "84b6eb"
     };
     payload.issue.labels[0] = unrecognizedLabel;
     payload.label = unrecognizedLabel;
-    payload.action = event;
     return payload;
-  },
+  }()),
 
-  issueForPayloadWithReqLabel: baseIssue,
-
-  issueForPayloadWithoutReqLabel: (function() {
+  issueWithNoLabels: (function() {
     let issue = cloneObject(baseIssue);
-    issue.labels[0] = {
-      "name": "i18n",
-      "color": "84b6eb"
-    };
+    issue.labels = [];
     return issue;
-  })(),
+  }()),
 
-  issueForPayloadWithNormalRepoName : baseIssue
+  payloadWithNoLabels: (function() {
+    let payload = cloneObject(basePayload);
+    payload.issue.labels = [];
+    return payload;
+  }())
 
 }
