@@ -63,18 +63,32 @@ const populateIssues = (pageNo=1) => {
 };
 
 populateIssues().then(function(issueResults) {
-  const couchIssuesDB = nano(`${config.couch.host}:${config.couch.port}/${config.couch.dbName}`);
-  Promise.promisifyAll(couchIssuesDB);
-  const dataStore = new DataStore(couchIssuesDB);
-  const issueHandler = new IssueHandler(dataStore, repos);
+  const unauthedCouchIssuesDB = nano(`${config.couch.host}:${config.couch.port}/${config.couch.dbName}`);
 
-  const issues = issueResults.filter(issue => !issue['pull_request']);
-  logger.info(`No of issues from the api: ${issues.length}`);
-  issueHandler.bulkAdd(repoInfo, issues).then(function() {
-    logger.info(`Success ${repoInfo} has been processed`);
-    process.exit(0);
-  }, function(err) {
-    logger.error(`Import of ${repoInfo} failed because of ${err}`);
-    process.exit(1);
+  unauthedCouchIssuesDB.auth(config.couch.username, config.couch.password, function (err, body, headers) {
+    if (err) {
+      logger.info(err);
+      return;
+    }
+
+    const couchIssuesDB = require('nano')({
+      url: `${config.couch.host}:${config.couch.port}/${config.couch.dbName}`,
+      cookie: headers['set-cookie']
+    });
+    Promise.promisifyAll(couchIssuesDB);
+    const dataStore = new DataStore(couchIssuesDB);
+    const issueHandler = new IssueHandler(dataStore, repos);
+
+    const issues = issueResults.filter(issue => !issue['pull_request']);
+    logger.info(`No of issues from the api: ${issues.length}`);
+    issueHandler.bulkAdd(repoInfo, issues).then(function() {
+      logger.info(`Success ${repoInfo} has been processed`);
+      process.exit(0);
+    }, function(err) {
+      logger.error(`Import of ${repoInfo} failed because of ${err}`);
+      process.exit(1);
+    });
+
   });
+
 });
