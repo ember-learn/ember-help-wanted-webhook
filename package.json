@@ -31,7 +31,7 @@
     "bunyan": "1.8.1",
     "github": "0.2.4",
     "github-webhook-handler": "^0.5.0",
-    "mocha": "^2.4.5",
+    "mocha": "^3.0.0",
     "mocha-only-detector": "^0.1.0",
     "nano": "6.2.0",
     "parse-link-header": "0.4.1",
