@@ -1,5 +1,6 @@
 # ember-help-wanted-webhook
 [![TravisCI Build Status][travis-badge]][travis-badge-url]
+
 [travis-badge]: https://img.shields.io/travis/ember-learn/ember-help-wanted-webhook/master.svg?label=TravisCI
 [travis-badge-url]: https://travis-ci.org/ember-learn/ember-help-wanted-webhook
 
